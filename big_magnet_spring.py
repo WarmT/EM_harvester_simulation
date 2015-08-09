@@ -7,16 +7,16 @@ import time
 from scipy.interpolate import interp1d
 
 def main():
-    F_meas = np.array([1.4, 1.5, 1.6, 1.95,  2.5, 3.0, 3.5, 4.2, 5.1, 5.6, 7.2, 10.25, 12.6, 15.5, 20.0, 25.8, 31.0, 42.6, 60.9, 79.9, 119.7, 147.8, 205.6, 300.4, 400.1, 498.8], dtype='float32')
-    s_meas = np.array([ 50,  49,  48,   45,   42,  40,  38,  35,  34,  32,  30, 26.60,   25,   23, 21.0, 19.2, 18.0, 15.9, 13.9, 12.5, 10.24,  9.32,  7.88,  6.53,  5.34,  4.52], dtype='float32')
+    F_meas = np.array([6.0, 8.2, 11.5, 16.9, 28.4, 40.8, 48, 51.0, 65.2, 80.3,  100, 117,  174, 221, 298, 352, 400, 490], dtype='float')
+    s_meas = np.array([ 55,  50,   45,   40, 34.5,   30, 28, 27.8,   25,   23, 21.2,  20, 16.5,  15,  13,  12,  11, 9.8], dtype='float')
 
-    m = 10.25 / 1000
+    m = 28.49 / 1000
     g = 9.819
     F_meas = np.multiply(F_meas, g/1000) # convert grams to Newtons
     s_meas = np.divide(s_meas, 1000) # convert mm to m
 
-    d0 = 0.033225
-    xs = 0.007925
+    d0 = 0.029225
+    xs = 0.002225
 
     p3 = np.polyfit(s_meas, F_meas, 3)
     p5 = np.polyfit(s_meas, F_meas, 5)
@@ -50,8 +50,8 @@ def main():
     pp5 = np.poly1d(p5)
 
     h_range = np.arange(0.002, 0.062, 0.001)
-    m1_r = 0.009525/2; m1_t = 0.019050; m1_Br = 1.2;
-    m2_r = 0.009525/2; m2_t = 0.003175; m2_Br = 1.2;
+    m1_r = 0.015875/2; m1_t = 0.01905; m1_Br = 1.2
+    m2_r = 0.015000/2; m2_t = 0.00300; m2_Br = 1.2
     Nr = 20
     Nphi = 60
     start = time.time()
@@ -80,9 +80,9 @@ def main():
     ax.add_patch(patches.Rectangle((20, 2.7), 3, 0.3, facecolor='grey', alpha=0.2))
     ax.text(15, 2.8,"Magnet 2",fontsize=16)
     ax.annotate("",[23.5, 2.7],[23.5, 3.0],arrowprops=dict(arrowstyle='<->'))
-    ax.text(24, 2.8,"3.175 mm",fontsize=16)
+    ax.text(24, 2.8,"3.0 mm",fontsize=16)
     ax.annotate("",[20, 2.6],[23, 2.6],arrowprops=dict(arrowstyle='<->'))
-    ax.text(20, 2.3,"9.525 mm",fontsize=16)
+    ax.text(20, 2.3,"15.0 mm",fontsize=16)
 
     ax.annotate("",[23.5, 3],[23.5, 4],arrowprops=dict(arrowstyle='<->'))
     ax.text(24, 3.5,"Separation Distance",fontsize=16)
@@ -95,7 +95,7 @@ def main():
 
     fig.set_tight_layout(True)
     #plt.tight_layout()
-    plt.savefig('small_magnet_spring.png')
+    plt.savefig('big_magnet_spring.png')
     plt.show()
 
     h_steps = 65
@@ -116,7 +116,7 @@ def main():
     plt.legend(loc=2)
     plt.axis([-30, 30, -10.0, 10.0])
     fig.set_tight_layout(True)
-    plt.savefig('small_magnet_restoration_force.png')
+    plt.savefig('big_magnet_restoration_force.png')
     plt.show()
 
 if __name__ == "__main__":
