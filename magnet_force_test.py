@@ -17,7 +17,7 @@ def main():
     Nr = 20
     Nphi = 60
     m = 0.01025
-    g = 9.81
+    g = 9.819 # gravitation in Helsinki
     
     h_range = np.linspace(0.001, 0.062, 63)
     F = calc_force(m1_r, m1_t, m1_Br, m2_r, m2_t, m2_Br, h_range, Nr, Nphi)
@@ -51,6 +51,7 @@ def main():
     plt.xlabel('Moving magnet position in harvester (mm)')
     plt.ylabel('Repulsion Force (N)')
     fig.set_tight_layout(True)
+    plt.savefig('small_magnet_spring_d0_sweep.png')
     plt.show()
 
 
