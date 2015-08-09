@@ -49,7 +49,7 @@ def main():
     plt.legend(loc=2)
     plt.axis([-30, 30, -10, 10])
     plt.xlabel('Moving magnet position in harvester (mm)')
-    plt.ylabel('Repulsion Force (N)')
+    plt.ylabel('Restoration Force (N)')
     fig.set_tight_layout(True)
     plt.savefig('small_magnet_spring_d0_sweep.png')
     plt.show()
