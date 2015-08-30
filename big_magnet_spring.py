@@ -75,6 +75,8 @@ def main():
     ax.text(15, 4.7,"Magnet 1",fontsize=16)
     ax.annotate("",[23.5, 4],[23.5, 5.5],arrowprops=dict(arrowstyle='<->'))
     ax.text(24, 4.7,"19.05 mm",fontsize=16)
+    ax.annotate("",[20, 5.6],[23, 5.6],arrowprops=dict(arrowstyle='<->'))
+    ax.text(20, 5.7 ,"15.875 mm",fontsize=16)
 
 
     ax.add_patch(patches.Rectangle((20, 2.7), 3, 0.3, facecolor='grey', alpha=0.2))
@@ -95,7 +97,7 @@ def main():
 
     fig.set_tight_layout(True)
     #plt.tight_layout()
-    plt.savefig('big_magnet_spring.png')
+    plt.savefig('big_magnet_spring.pdf')
     plt.show()
 
     h_steps = 65
@@ -112,11 +114,11 @@ def main():
     plt.plot(xp*1000, -p5_ff, '-', label="5th order polyfit")
     plt.plot(x*1000, F, '-', label="FEM")
     plt.xlabel('Moving magnet position in harvester (mm)')
-    plt.ylabel('Restoration Force (N)')
+    plt.ylabel('Restoring Force (N)')
     plt.legend(loc=2)
     plt.axis([-30, 30, -10.0, 10.0])
     fig.set_tight_layout(True)
-    plt.savefig('big_magnet_restoration_force.png')
+    plt.savefig('big_magnet_restoring_force.pdf')
     plt.show()
 
 if __name__ == "__main__":
