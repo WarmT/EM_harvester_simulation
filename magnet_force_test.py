@@ -15,7 +15,7 @@ def main():
     m2_t = 0.003175
     m2_Br = 1.2
     Nr = 20
-    Nphi = 60
+    Nphi = 20
     m = 0.01025
     g = 9.819 # gravitation in Helsinki
     

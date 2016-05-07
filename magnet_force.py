@@ -21,13 +21,23 @@ def calc_force_dist(m1_r, m1_t, m1_Br, m2_r, m2_t, m2_Br, h, Nr, Nphi):
     R_i_prev = 0.0
     for i in range(0, Nr):
         R_i = sqrt(R_i_prev*R_i_prev + m1_Rslice)
-        ri = (R_i+R_i_prev)/2
+        if i == 0:
+            ri = 2*R_i*np.sin(delta_phi/2)/(delta_phi/2*3)
+        else:
+            ri = 2*(R_i*R_i + R_i*R_i_prev + R_i_prev*R_i_prev)*np.sin(delta_phi/2)/(delta_phi/2*3*(R_i+R_i_prev))
+#            ri = (R_i+R_i_prev)/2
+#        ri = (R_i+R_i_prev)/2
         R_i_prev = R_i
         S2 = 0.0
         R_ii_prev = 0.0
         for ii in range(0, Nr):
             R_ii = sqrt(R_ii_prev*R_ii_prev + m2_Rslice)
-            rii = (R_ii+R_ii_prev)/2
+            if ii == 0:
+                rii = 2*R_ii*np.sin(delta_phi/2)/(delta_phi/2*3)
+            else:
+                rii = 2*(R_ii*R_ii + R_ii*R_ii_prev + R_ii_prev*R_ii_prev)*np.sin(delta_phi/2)/(delta_phi/2*3*(R_ii+R_ii_prev))
+#                rii = (R_ii+R_ii_prev)/2
+#            rii = (R_ii+R_ii_prev)/2
             R_ii_prev = R_ii
             S3 = 0.0
             ri_rii_producs = ri*ri+rii*rii
