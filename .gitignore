@@ -1,1 +1,6 @@
 *.pyc
+*.lprof
+tmp/*
+*.png
+*.pdf
+*.csv
