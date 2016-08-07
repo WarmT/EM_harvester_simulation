@@ -2,6 +2,7 @@
 *.lprof
 *.prof
 tmp/*
+pics/*
 *.png
 *.pdf
 *.csv
