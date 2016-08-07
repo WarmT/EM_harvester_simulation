@@ -1,6 +1,9 @@
 *.pyc
 *.lprof
+*.prof
 tmp/*
 *.png
 *.pdf
 *.csv
+*.xls
+*.xlsx
