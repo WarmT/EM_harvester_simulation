@@ -353,7 +353,7 @@ def test_Heuman_Lambda():
             
     print "+-----+-------+---------+----------+----------+----------------+----------+\n"
     
-    no = 10000
+    no = 1000
     
     steps = 10
     alpha_test = np.linspace(0, 90, steps)

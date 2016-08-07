@@ -56,6 +56,9 @@ def main():
     Nphi = 60
     start = time.time()
     F = calc_force_dist(m1_r, m1_t, m1_Br, m2_r, m2_t, m2_Br, h_range, Nr, Nphi)
+    m1_r = 0.009525/2; m1_t = 0.019050; m1_Br = 1.3;
+    m2_r = 0.009525/2; m2_t = 0.003175; m2_Br = 1.3;
+    F2 = calc_force_dist(m1_r, m1_t, m1_Br, m2_r, m2_t, m2_Br, h_range, Nr, Nphi)
     end = time.time()
     print "\nForce calculation takes %.4f seconds.\n" % (end-start)
     xp = np.linspace(0.002,0.062, 61)
@@ -65,7 +68,8 @@ def main():
     #plt.plot(np.multiply(s,1000), F, 'o', label='Measurements')
     plt.plot(np.multiply(xp, 1000), pp3(xp), '-', label="3rd order polyfit")
     plt.plot(np.multiply(xp, 1000), pp5(xp), '-', label="5th order polyfit")
-    plt.plot(np.multiply(h_range,1000), F, '-', lw=2, label='FEM')
+    plt.plot(np.multiply(h_range,1000), F, '-', lw=2, label='FEM, Br = 1.2 T')
+    plt.plot(np.multiply(h_range,1000), F2, '-', lw=2, label='FEM, Br = 1.3 T')
     plt.legend()
     plt.axis([0.0, 60, -2.0, 6.0])
     plt.xlabel('Separation Distance (mm)')
