@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from __future__ import division
 from scipy.special import ellipk, ellipe, ellipkinc, ellipeinc
 from sympy import elliptic_k, elliptic_e, elliptic_pi
@@ -54,6 +55,7 @@ def cel(kc, p, c, s):
         em = k + em
     return (np.pi/2*(ss + cc*em)/(em*(em + pp)))
 
+@jit
 def Heuman_Lambda(phi, m):
     if phi == np.pi/2:
         return 1.0
@@ -69,7 +71,19 @@ def Heuman_Lambda(phi, m):
     HL = 2/np.pi * (E*incF + K*incE - K*incF)
     return HL
 
-def nasa(Br, a, b, r, z):
+@jit
+def nasa_axial(Br, a, b, r, z):
+    """
+    nasa_axial calculates the magnetic flux density of a cylindrical permanent magnet as defined in [NASA].
+    
+    Br = Residual Flux Density [T]
+    a  = Coil radius [m]
+    b  = magnet length / 2 [m]
+    r  = radius from the z axis
+    z  = z coordinate
+    
+    [NASA]      Callaghan, E.E. and Maslen, S.H., 1960. The magnetic field of a finite solenoid. 
+    """
     
     if ((z == b) and (r == a)) or ((z == -b) and (r == a)):
         r = 1.0001 * r
@@ -100,6 +114,7 @@ def nasa(Br, a, b, r, z):
 
     return BZ
 
+@jit
 def nasa_radial(Br, a, b, r, z):
 
     if ((z == b) and (r == a)) or ((z == -b) and (r == a)):
@@ -126,10 +141,20 @@ def nasa_radial(Br, a, b, r, z):
 
     return BZ
 
-
-
 @jit
-def Foelsch1(Br, a, b, r, z):
+def Foelsch1_axial(Br, a, b, r, z):
+    """
+    Foelsch1_axial calculates the magnetic flux density of a cylindrical permanent magnet as defined in [Foelsch].
+    
+    Br = Residual Flux Density [T]
+    a  = Coil radius [m]
+    b  = magnet length / 2 [m]
+    r  = radius from the z axis
+    z  = z coordinate
+    
+    [Foelsch]   Foelsch, K., 1936. Magnetfeld und Induktivität einer zylindrischen Spule. 
+                Archiv für Elektrotechnik, 30(3), pp.139-157.
+    """
     
     if a == r:
         r = 1.0001 * r
@@ -164,7 +189,20 @@ def Foelsch1(Br, a, b, r, z):
 #    print "Legendre:  z = %.4f, r = %.4f, A1 = % 1.5f, A2 = % 1.5f, B1 = % 1.5f, B2 = % 1.5f, Bz = % 1.5f" % (x, r, A1, A2, B1, B2, BZ)
     return BZ
 
-def Foelsch2(Br, a, b, r, z):
+@jit
+def Foelsch2_axial(Br, a, b, r, z):
+    """
+    Foelsch2_axial calculates the magnetic flux density of a cylindrical permanent magnet as defined in [Foelsch].
+    
+    Br = Residual Flux Density [T]
+    a  = Coil radius [m]
+    b  = magnet length / 2 [m]
+    r  = radius from the z axis
+    z  = z coordinate
+    
+    [Foelsch]   Foelsch, K., 1936. Magnetfeld und Induktivität einer zylindrischen Spule. 
+                Archiv für Elektrotechnik, 30(3), pp.139-157.
+    """
 
     if ((z == b) and (r == a)) or ((z == -b) and (r == a)):
         r = 1.0001 * r
@@ -230,15 +268,18 @@ def Foelsch2(Br, a, b, r, z):
     return BZ
 
 @jit
-def Derby(Br, a, b, r, z):
+def Derby_axial(Br, a, b, r, z):
     """
-    Derby calculates the magnetic flux density of a cylindrical permanent magnet
+    Derby_axial calculates the magnetic flux density of a cylindrical permanent magnet as defined in [DERBY].
     
     Br = Residual Flux Density [T]
     a  = Coil radius [m]
     b  = magnet length / 2 [m]
     r  = radius from the z axis
-    z  = z coordinate 
+    z  = z coordinate
+    
+    [DERBY]     Derby, N. and Olbert, S., 2010. Cylindrical magnets and ideal solenoids. 
+                American Journal of Physics, 78(3), pp.229-235.
     """
     
     if ((abs(z-b)<tol) and (abs(r-a)<tol)) or ((abs(z+b)<tol) and (abs(r-a)<tol)):
@@ -258,216 +299,126 @@ def Derby(Br, a, b, r, z):
 
     return Bz
 
-
-#@profile
-def flux_linkage_Foelsch2(Br, mag_h, mag_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts):#, parts2):
+@jit
+def flux_linkage_Foelsch2_axial(Br, mag_h, mag_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts):
     Nz = 2 * coil_h / (d_co * np.sqrt(np.pi/k_co))
     Nr  = 2 * (coil_r2 - coil_r1) / (d_co * np.sqrt(np.pi/k_co))
     dN = Nz * Nr / (parts * parts)
 
-    phi = 0.0
+    FL = 0.0
     dz = coil_h / parts
     dz2 = dz / 2
     z = d - coil_h/2 + dz2
     for j in xrange(parts):
         r = 0
-        dphi = 0.0
+        dFL = 0.0
 
         dr = mag_r / parts
         dr2 = dr / 2
         for i in xrange(parts):
-            Bz = Foelsch2(Br, mag_r, mag_h/2, r+dr2, z)
-            dphi += Bz * np.pi * ( (r+dr)*(r+dr) - r*r )
-            phi += dphi
+            Bz = Foelsch2_axial(Br, mag_r, mag_h/2, r+dr2, z)
+            dFL += Bz * np.pi * ( (r+dr)*(r+dr) - r*r )
             r += dr
         r += dr/100
             
         dr = (coil_r1 - mag_r) / parts
         dr2 = dr / 2
         for i in xrange(parts):
-            Bz = Foelsch2(Br, mag_r, mag_h/2, r+dr2, z)
-            dphi += Bz * np.pi * ( (r+dr)*(r+dr) - r*r )
-            phi += dphi
+            Bz = Foelsch2_axial(Br, mag_r, mag_h/2, r+dr2, z)
+            dFL += Bz * np.pi * ( (r+dr)*(r+dr) - r*r )
             r += dr
 
         dr = (coil_r2 - coil_r1) / parts
         dr2 = dr / 2
         for i in xrange(parts):
-            Bz = Foelsch2(Br, mag_r, mag_h/2, r+dr2, z)
-            dphi += Bz * np.pi * ( (r+dr)*(r+dr) - r*r )
-            phi += dN * dphi
+            Bz = Foelsch2_axial(Br, mag_r, mag_h/2, r+dr2, z)
+            dFL += Bz * np.pi * ( (r+dr)*(r+dr) - r*r )
+            FL += dN * dFL
             r += dr
         z += dz
-    return phi
+    return FL
     
-def flux_linkage_nasa_orig(Br, mag_h, mag_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts):#, parts2):
-    Nz = 2 * coil_h / (d_co * np.sqrt(np.pi/k_co))
-    Nr  = 2 * (coil_r2 - coil_r1) / (d_co * np.sqrt(np.pi/k_co))
-    dN = Nz * Nr / (parts * parts)
-
-    
-    phi = 0.0
-    dz = coil_h / parts
-    dz2 = dz / 2
-    z = d - coil_h/2 + dz2
-    for j in xrange(parts):
-        r = 0
-        dphi = 0.0
-
-        dr = mag_r / parts
-        dr2 = dr / 2
-        for i in xrange(parts):
-            Bz = nasa(Br, mag_r, mag_h/2, r+dr2, z)
-            dphi += Bz * np.pi * ( (r+dr)*(r+dr) - r*r )
-            phi += dphi
-            r += dr
-            
-        dr = (coil_r1 - mag_r) / parts
-        dr2 = dr / 2
-        for i in xrange(parts):
-            Bz = nasa(Br, mag_r, mag_h/2, r+dr2, z)
-            dphi += Bz * np.pi * ( (r+dr)*(r+dr) - r*r )
-            phi += dphi
-            r += dr
-
-        dr = (coil_r2 - coil_r1) / parts
-        dr2 = dr / 2
-        for i in xrange(parts):
-            Bz = nasa(Br, mag_r, mag_h/2, r+dr2, z)
-            dphi += Bz * np.pi * ( (r+dr)*(r+dr) - r*r )
-            phi += dN * dphi
-            r += dr
-        z += dz
-    return phi
-
-def flux_linkage_nasa(Br, mag_h, mag_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts):#, parts2):
-    Nz = 2 * coil_h / (d_co * np.sqrt(np.pi/k_co))
-    Nr  = 2 * (coil_r2 - coil_r1) / (d_co * np.sqrt(np.pi/k_co))
-#    dN = Nz * Nr / (parts * parts)
-    dN = Nz * Nr / (parts * parts * 3)
-
-    
-    phi = 0.0
-#    dz = coil_h / parts
-    dz = coil_h / (3*parts)
-    dz2 = dz / 2
-    z = d - coil_h/2 + dz2
-#    for j in xrange(parts):
-    for j in xrange(3*parts):
-        r = 0
-        dphi = 0.0
-
-        dr = mag_r / parts
-        dr2 = dr / 2
-        for i in xrange(parts):
-            Bz = nasa(Br, mag_r, mag_h/2, r+dr2, z)
-            dphi += Bz * np.pi * ( (r+dr)*(r+dr) - r*r )
-#            phi += dphi
-            r += dr
-            
-        dr = (coil_r1 - mag_r) / parts
-        dr2 = dr / 2
-        for i in xrange(parts):
-            Bz = nasa(Br, mag_r, mag_h/2, r+dr2, z)
-            dphi += Bz * np.pi * ( (r+dr)*(r+dr) - r*r )
-#            phi += dphi
-            r += dr
-
-        dr = (coil_r2 - coil_r1) / parts
-        dr2 = dr / 2
-        for i in xrange(parts):
-            Bz = nasa(Br, mag_r, mag_h/2, r+dr2, z)
-            dphi += Bz * np.pi * ( (r+dr)*(r+dr) - r*r )
-            phi += dN * dphi
-            r += dr
-        z += dz
-    return phi
-
-def flux_linkage_nasa_all(Br, mag_h, mag_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts):#, parts2):
+@jit
+def flux_linkage_nasa_axial(Br, mag_h, mag_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts):
     Nz_float = 2 * coil_h / (d_co * np.sqrt(np.pi/k_co))
     Nr_float = 2 * (coil_r2 - coil_r1) / (d_co * np.sqrt(np.pi/k_co))
     Nr = int(round(Nr_float))
     Nz = int(round(Nz_float))
-#    dN = Nz * Nr / (parts * parts)
-#    dN = Nz * Nr / (parts * parts * 3)
     dN = Nz_float/Nz * Nr_float/Nr
 #    print "Nz = %d, Nz_float = %.3f, Nr = %d, Nr_float = %.3f, dN = %.3f, N_int = %d, N_float = %.2f, N = %.2f" % (Nz, Nz_float, Nr, Nr_float, dN, Nr*Nz, Nr_float*Nz_float, Nr*Nz*dN)
     
-    phi = 0.0
+    FL = 0.0
 #    dz = coil_h / parts
     dz = coil_h / (Nz)
     dz2 = dz / 2
     z = d - coil_h/2 + dz2
-#    for j in xrange(parts):
     for j in xrange(Nz):
         r = 0
-        dphi = 0.0
+        dFL = 0.0
 
         dr = mag_r / parts
         dr2 = dr / 2
         for i in xrange(parts):
-            Bz = nasa(Br, mag_r, mag_h/2, r+dr2, z)
-            dphi += Bz * np.pi * ( (r+dr)*(r+dr) - r*r )
-#            phi += dphi
+            Bz = nasa_axial(Br, mag_r, mag_h/2, r+dr2, z)
+            dFL += Bz * np.pi * ( (r+dr)*(r+dr) - r*r )
             r += dr
             
         dr = (coil_r1 - mag_r) / parts
         dr2 = dr / 2
         for i in xrange(parts):
-            Bz = nasa(Br, mag_r, mag_h/2, r+dr2, z)
-            dphi += Bz * np.pi * ( (r+dr)*(r+dr) - r*r )
-#            phi += dphi
+            Bz = nasa_axial(Br, mag_r, mag_h/2, r+dr2, z)
+            dFL += Bz * np.pi * ( (r+dr)*(r+dr) - r*r )
             r += dr
 
         dr = (coil_r2 - coil_r1) / Nr
         dr2 = dr / 2
         for i in xrange(Nr):
-            Bz = nasa(Br, mag_r, mag_h/2, r+dr2, z)
-            dphi += Bz * np.pi * ( (r+dr)*(r+dr) - r*r )
-            phi += dN * dphi
+            Bz = nasa_axial(Br, mag_r, mag_h/2, r+dr2, z)
+            dFL += Bz * np.pi * ( (r+dr)*(r+dr) - r*r )
+            FL += dN * dFL
             r += dr
         z += dz
-    return phi
+    return FL
     
 @jit
-def flux_linkage_Derby(Br, mag_h, mag_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts):
+def flux_linkage_Derby_axial(Br, mag_h, mag_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts):
     Nz_float = 2 * coil_h / (d_co * np.sqrt(np.pi/k_co))
     Nr_float = 2 * (coil_r2 - coil_r1) / (d_co * np.sqrt(np.pi/k_co))
     Nr = int(round(Nr_float))
     Nz = int(round(Nz_float))
     dN = Nz_float/Nz * Nr_float/Nr
     
-    phi = 0.0
+    FL = 0.0
     dz = coil_h / (Nz)
     dz2 = dz / 2
     z = d - coil_h/2 + dz2
     for j in xrange(Nz):
         r = 0
-        dphi = 0.0
+        dFL = 0.0
 
         dr = mag_r / parts
         dr2 = dr / 2
         for i in xrange(parts):
-            Bz = Derby(Br, mag_r, mag_h/2, r+dr2, z)
-            dphi += Bz * np.pi * ( (r+dr)*(r+dr) - r*r )
+            Bz = Derby_axial(Br, mag_r, mag_h/2, r+dr2, z)
+            dFL += Bz * np.pi * ( (r+dr)*(r+dr) - r*r )
             r += dr
             
         dr = (coil_r1 - mag_r) / parts
         dr2 = dr / 2
         for i in xrange(parts):
-            Bz = Derby(Br, mag_r, mag_h/2, r+dr2, z)
-            dphi += Bz * np.pi * ( (r+dr)*(r+dr) - r*r )
+            Bz = Derby_axial(Br, mag_r, mag_h/2, r+dr2, z)
+            dFL += Bz * np.pi * ( (r+dr)*(r+dr) - r*r )
             r += dr
 
         dr = (coil_r2 - coil_r1) / Nr
         dr2 = dr / 2
         for i in xrange(Nr):
-            Bz = Derby(Br, mag_r, mag_h/2, r+dr2, z)
-            dphi += Bz * np.pi * ( (r+dr)*(r+dr) - r*r )
-            phi += dN * dphi
+            Bz = Derby_axial(Br, mag_r, mag_h/2, r+dr2, z)
+            dFL += Bz * np.pi * ( (r+dr)*(r+dr) - r*r )
+            FL += dN * dFL
             r += dr
         z += dz
-    return phi
+    return FL
 
 def calc_flux_gradient(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, N, d_co, d):
     parts = 12
@@ -479,64 +430,21 @@ def calc_flux_gradient(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, N, d_co, d):
 
     step = coil_h / Nz
     
-    y1 = flux_linkage_Derby(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d-step, parts)
-    y2 = flux_linkage_Derby(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d+step, parts)
+    y1 = flux_linkage_Derby_axial(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d-step, parts)
+    y2 = flux_linkage_Derby_axial(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d+step, parts)
     k = ( y2 - y1 ) / (2*step)
     
     return k
 
-
-def calc_power_orig(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, t0, resistivity):
-    parts = 12
-    
-#    step = 0.0001
-    
-#    resistivity = 13.6
-    
-    Nz = int(round( 2.0 * coil_h / (d_co * np.sqrt(np.pi/k_co)) ))
-    Nr = int(round( 2.0 * (coil_r2 - coil_r1) / (d_co * np.sqrt(np.pi/k_co)) ))
-    N = int(round( 4.0 * coil_h * (coil_r2 - coil_r1) * k_co / (d_co*d_co*np.pi) ))
-    print "Nz = %d, Nr = %d, N = %d" % (Nz, Nr, N)
-    step = coil_h / Nz
-    d = -(m_h+coil_h)/2+t0-step; y1 = flux_linkage_Derby(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)
-    d = -(m_h+coil_h)/2+t0+step; y2 = flux_linkage_Derby(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)
-    k = ( y2 - y1 ) / (2*step)
-    
-#    print "Nz = %d, Nr = %d, N = %d" % (round(Nz), round(Nr), round(N))
-    R_coil = N * np.pi * (coil_r2 + coil_r1) * resistivity
-    dm = 0.1
-    R_load = R_coil + k*k/dm
-#    print "R_coil = %.2f Ohms, R_load = %.2f Ohms, k = %.5f" % (R_coil, R_load, k)
-    
-    de = k * k / ( R_coil + R_load )
-    density = 7600.0
-    m = m_h * np.pi * m_r * m_r * density
-#    print "de = %.2f, m = %.2f g" % (de, m*1000)
-    
-    a = 10.0
-    f = 100.0
-    omega = 2 * np.pi * f
-    Z = m * a / ((de+dm)*omega)
-    speed = Z * omega
-#    speed = a / ( omega * (2*(de+dm)/(2*m*omega)) )
-    V = k * speed
-    V_load = V * R_load / (R_coil + R_load)
-    I = V / (R_coil + R_load)
-    P = V_load * V_load / R_load
-    d = -(m_h+coil_h)/2+t0
-#    print "t0 = %.3f mm, coil_h = %.3f mm, t0/coil_h = %.2f %%" % (t0*1000, coil_h*1000, t0/coil_h  )
-    step_percent = step/coil_h*100
-    print "calc_power: d = %.3f mm, %.2f %%, %.3f m/s, Vall = %.3f V, V_load = %.4f V, P_load = %.3f mW, R_coil = %.2f Ohm, R_load = %d Ohm, k = %.3f V/(m/s)" % (d*1000, t0/coil_h, speed, V, V_load, P*1000, R_coil, round(R_load), k)
-    return P
-
+@jit
 def calc_power(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, N, d_co, t0, a, f):
     parts = 12
 
     k_co = np.pi * d_co * d_co * N / ( 4 * coil_h * ( coil_r2 - coil_r1 ) )
     
     step = coil_h / 100
-    d = -(m_h+coil_h)/2+t0-step; y1 = flux_linkage_Derby(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)
-    d = -(m_h+coil_h)/2+t0+step; y2 = flux_linkage_Derby(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)
+    d = -(m_h+coil_h)/2+t0-step; y1 = flux_linkage_Derby_axial(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)
+    d = -(m_h+coil_h)/2+t0+step; y2 = flux_linkage_Derby_axial(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)
     k = ( y2 - y1 ) / (2*step)
     
 #    print "Nz = %d, Nr = %d, N = %d" % (round(Nz), round(Nr), round(N))
@@ -568,8 +476,8 @@ def calc_power_all(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, N, d_co, t0, a, f):
     k_co = np.pi * d_co * d_co * N / ( 4 * coil_h * ( coil_r2 - coil_r1 ) )
     
     step = coil_h / 100
-    d = -(m_h+coil_h)/2+t0-step; y1 = flux_linkage_Derby(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)
-    d = -(m_h+coil_h)/2+t0+step; y2 = flux_linkage_Derby(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)
+    d = -(m_h+coil_h)/2+t0-step; y1 = flux_linkage_Derby_axial(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)
+    d = -(m_h+coil_h)/2+t0+step; y2 = flux_linkage_Derby_axial(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)
     k = ( y2 - y1 ) / (2*step)
     
 #    print "Nz = %d, Nr = %d, N = %d" % (round(Nz), round(Nr), round(N))
@@ -594,14 +502,15 @@ def calc_power_all(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, N, d_co, t0, a, f):
 
     return (Z, R_coil, R_load, k, V_load, P)
 
+@jit
 def calc_power_all_two_coils(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, N, d_co, t0, a, f):
     parts = 12
 
     k_co = np.pi * d_co * d_co * N / ( 4 * coil_h * ( coil_r2 - coil_r1 ) )
     
     step = coil_h / 100
-    d = -(m_h+coil_h)/2+t0-step; y1 = flux_linkage_Derby(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)
-    d = -(m_h+coil_h)/2+t0+step; y2 = flux_linkage_Derby(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)
+    d = -(m_h+coil_h)/2+t0-step; y1 = flux_linkage_Derby_axial(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)
+    d = -(m_h+coil_h)/2+t0+step; y2 = flux_linkage_Derby_axial(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)
 #    k = ( y2 - y1 ) / (2*step)
     k = ( y2 - y1 ) / (step) # k is now doubled !!!!!!!!
     
@@ -627,14 +536,15 @@ def calc_power_all_two_coils(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, N, d_co, 
 
     return (Z, R_coil, R_load, k, V_load, P)
 
+@jit
 def calc_power_two_coils(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, N, d_co, t0, a, f):
     parts = 12
 
     k_co = np.pi * d_co * d_co * N / ( 4 * coil_h * ( coil_r2 - coil_r1 ) )
     
     step = coil_h / 100
-    d = -(m_h+coil_h)/2+t0-step; y1 = flux_linkage_Derby(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)
-    d = -(m_h+coil_h)/2+t0+step; y2 = flux_linkage_Derby(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)
+    d = -(m_h+coil_h)/2+t0-step; y1 = flux_linkage_Derby_axial(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)
+    d = -(m_h+coil_h)/2+t0+step; y2 = flux_linkage_Derby_axial(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)
 #    k = ( y2 - y1 ) / (2*step)
     k = ( y2 - y1 ) / (step) # k is now doubled !!!!!!!!
     
@@ -658,42 +568,6 @@ def calc_power_two_coils(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, N, d_co, t0, 
     V_load = V * R_load / (R_coil + R_load)
     P = V_load * V_load / R_load
 
-    return P
-
-
-def calc_power_print(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, N, d_co, t0, a, f):
-    parts = 12
-
-    k_co = np.pi * d_co * d_co * N / ( 4 * coil_h * ( coil_r2 - coil_r1 ) )
-    
-    step = coil_h / 100
-    d = -(m_h+coil_h)/2+t0-step; y1 = flux_linkage_Derby(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)
-    d = -(m_h+coil_h)/2+t0+step; y2 = flux_linkage_Derby(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)
-    k = ( y2 - y1 ) / (2*step)
-    
-#    print "Nz = %d, Nr = %d, N = %d" % (round(Nz), round(Nr), round(N))
-    resistivity = 1.709e-8/(d_co*d_co*np.pi/4)
-    R_coil = N * np.pi * (coil_r2 + coil_r1) * resistivity
-    dm = 0.1
-    R_load = R_coil + k*k/dm
-#    print "R_coil = %.2f Ohms, R_load = %.2f Ohms, k = %.5f" % (R_coil, R_load, k)
-    
-    de = k * k / ( R_coil + R_load )
-    density = 7600.0
-    m = m_h * np.pi * m_r * m_r * density
-#    print "de = %.2f, m = %.2f g" % (de, m*1000)
-    
-    omega = 2 * np.pi * f
-    Z = m * a / ((de+dm)*omega)
-    speed = Z * omega
-
-    V = k * speed
-    V_load = V * R_load / (R_coil + R_load)
-    P = V_load * V_load / R_load
-
-    d = -(m_h+coil_h)/2+t0
-    step_percent = step/coil_h*100
-    print "calc_power: d = %.3f mm, %.2f %%, %.3f m/s, Vall = %.3f V, V_load = %.4f V, P_load = %.3f mW, R_coil = %.2f Ohm, R_load = %d Ohm, k = %.3f V/(m/s)" % (d*1000, t0/coil_h, speed, V, V_load, P*1000, R_coil, round(R_load), k)
     return P
 
 def draw_flux_lines_coil(outfile, m_Br, m_r, m_h, coil_r1, coil_r2, coil_h, N, d_co, t0, P_max, two_coils):
@@ -724,7 +598,7 @@ def draw_flux_lines_coil(outfile, m_Br, m_r, m_h, coil_r1, coil_r2, coil_h, N, d
 
     for i in range(steps):
         for j in range(steps2):
-            Bz_axial  = nasa(Br, m_r, m_h/2, X[i][steps2+j], Y[i][steps2+j])
+            Bz_axial  = nasa_axial(Br, m_r, m_h/2, X[i][steps2+j], Y[i][steps2+j])
             B[i][steps2+j] = -Bz_axial
             B[i][steps2-j] = -Bz_axial
 

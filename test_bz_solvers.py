@@ -107,10 +107,10 @@ def test_bz_solvers():
     hmag = 2.0*hmag_per_2
     z = hmag_per_2
 
-    t_Foelsch1 = timeit.Timer(lambda: Foelsch1(Br, coil_r, hmag_per_2, r, z))
-    t_Foelsch2 = timeit.Timer(lambda: Foelsch2(Br, coil_r, hmag_per_2, r, z))
-    t_nasa = timeit.Timer(lambda: nasa(Br, coil_r, hmag_per_2, r, z))
-    t_derby = timeit.Timer(lambda: Derby(Br, coil_r, hmag_per_2, r, z))
+    t_Foelsch1 = timeit.Timer(lambda: Foelsch1_axial(Br, coil_r, hmag_per_2, r, z))
+    t_Foelsch2 = timeit.Timer(lambda: Foelsch2_axial(Br, coil_r, hmag_per_2, r, z))
+    t_nasa = timeit.Timer(lambda: nasa_axial(Br, coil_r, hmag_per_2, r, z))
+    t_derby = timeit.Timer(lambda: Derby_axial(Br, coil_r, hmag_per_2, r, z))
 
 
     no = 10000
@@ -189,10 +189,10 @@ def plot_bz():
     hmag = 2.0*hmag_per_2
     z = hmag_per_2
     for ind, z in enumerate(zz):
-        z_Foelsch1[ind] = Foelsch1(Br, coil_r, hmag_per_2, r, z)
-        z_Foelsch2[ind] = Foelsch2(Br, coil_r, hmag_per_2, r, z)
-        z_nasa[ind]     = nasa(Br, coil_r, hmag_per_2, r, z)
-        z_derby[ind]    = Derby(Br, coil_r, hmag_per_2, r, z)
+        z_Foelsch1[ind] = Foelsch1_axial(Br, coil_r, hmag_per_2, r, z)
+        z_Foelsch2[ind] = Foelsch2_axial(Br, coil_r, hmag_per_2, r, z)
+        z_nasa[ind]     = nasa_axial(Br, coil_r, hmag_per_2, r, z)
+        z_derby[ind]    = Derby_axial(Br, coil_r, hmag_per_2, r, z)
         z_analytic[ind] = Br/2*((z+hmag_per_2)/np.sqrt((z+hmag_per_2)*(z+hmag_per_2)+coil_r*coil_r)-(z-hmag_per_2)/np.sqrt((z-hmag_per_2)*(z-hmag_per_2)+coil_r*coil_r))
 
     fig = plt.figure(facecolor='white', figsize=(17, 6))
@@ -233,10 +233,10 @@ def plot_bz():
     z_nasa = np.zeros(zz.size)
     z_derby = np.zeros(zz.size)
     for ind, r in enumerate(zz):
-        z_Foelsch1[ind] = Foelsch1(Br, coil_r, hmag_per_2, r, z)
-        z_Foelsch2[ind] = Foelsch2(Br, coil_r, hmag_per_2, r, z)
-        z_nasa[ind]     = nasa(Br, coil_r, hmag_per_2, r, z)
-        z_derby[ind]    = Derby(Br, coil_r, hmag_per_2, r, z)
+        z_Foelsch1[ind] = Foelsch1_axial(Br, coil_r, hmag_per_2, r, z)
+        z_Foelsch2[ind] = Foelsch2_axial(Br, coil_r, hmag_per_2, r, z)
+        z_nasa[ind]     = nasa_axial(Br, coil_r, hmag_per_2, r, z)
+        z_derby[ind]    = Derby_axial(Br, coil_r, hmag_per_2, r, z)
 
     plt.plot(zz*1000, z_Foelsch1, label="Foelsch1")
     plt.plot(zz*1000, z_Foelsch2, label="Foelsch2")
@@ -273,7 +273,7 @@ def plot_bz():
 
     for i in range(steps):
         for j in range(steps2):
-            Bz_axial  = nasa(Br, m_r, m_h/2, X[i][steps2+j], Y[i][steps2+j])
+            Bz_axial  = nasa_axial(Br, m_r, m_h/2, X[i][steps2+j], Y[i][steps2+j])
             B[i][steps2+j] = -Bz_axial
             B[i][steps2-j] = -Bz_axial
 
@@ -304,10 +304,10 @@ def plot_bz():
 #    z_nasa = np.zeros(zz.size)
 #    z_derby = np.zeros(zz.size)
 #    for ind, r in enumerate(zz):
-#        z_Foelsch1[ind] = Foelsch1(Br, coil_r, hmag_per_2, r, z)
-#        z_Foelsch2[ind] = Foelsch2(Br, coil_r, hmag_per_2, r, z)
-#        z_nasa[ind]     = nasa(Br, coil_r, hmag_per_2, r, z)
-#        z_derby[ind]    = Derby(Br, coil_r, hmag_per_2, r, z2)
+#        z_Foelsch1[ind] = Foelsch1_axial(Br, coil_r, hmag_per_2, r, z)
+#        z_Foelsch2[ind] = Foelsch2_axial(Br, coil_r, hmag_per_2, r, z)
+#        z_nasa[ind]     = nasa_axial(Br, coil_r, hmag_per_2, r, z)
+#        z_derby[ind]    = Derby_axial(Br, coil_r, hmag_per_2, r, z2)
 #
 #    plt.plot(zz, z_Foelsch1, label="Foelsch1")
 #    plt.plot(zz, z_Foelsch2, label="Foelsch2")
@@ -348,7 +348,7 @@ def flux_linkage_nasa_slice(Br, mag_h, mag_r, coil_h, coil_r1, coil_r2, k_co, d_
     dr = mag_r / parts
     dr2 = dr / 2
     for i in xrange(parts):
-        Bz = nasa(Br, mag_r, mag_h/2, r+dr2, z)
+        Bz = nasa_axial(Br, mag_r, mag_h/2, r+dr2, z)
         Bz1[i] = Bz
         r1[i] = r
         ddphi = Bz * np.pi * ( (r+dr)*(r+dr) - r*r )
@@ -366,7 +366,7 @@ def flux_linkage_nasa_slice(Br, mag_h, mag_r, coil_h, coil_r1, coil_r2, k_co, d_
     dr = (coil_r1 - mag_r) / parts
     dr2 = dr / 2
     for i in xrange(parts):
-        Bz = nasa(Br, mag_r, mag_h/2, r+dr2, z)
+        Bz = nasa_axial(Br, mag_r, mag_h/2, r+dr2, z)
         Bz2[i] = Bz
         r2[i] = r
         ddphi = Bz * np.pi * ( (r+dr)*(r+dr) - r*r )
@@ -380,7 +380,7 @@ def flux_linkage_nasa_slice(Br, mag_h, mag_r, coil_h, coil_r1, coil_r2, k_co, d_
     dr = (coil_r2 - coil_r1) / parts
     dr2 = dr / 2
     for i in xrange(parts):
-        Bz = nasa(Br, mag_r, mag_h/2, r+dr2, z)
+        Bz = nasa_axial(Br, mag_r, mag_h/2, r+dr2, z)
         Bz3[i] = Bz
         r3[i] = r
         ddphi = dN * Bz * np.pi * ( (r+dr)*(r+dr) - r*r )
@@ -481,10 +481,10 @@ def test_flux_linkage():
     start = time.time()
     for parts in np.arange(1, 32):
         for ind, d in enumerate(dd):
-#           phi_Foelsch2[ind] = flux_linkage_Foelsch2(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, 11)#, 50)
-           phi_nasa[ind] = flux_linkage_nasa(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)#, 50)
-#                            flux_linkage_Derby(Br, mag_h, mag_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts): #, parts2):
-#            phi_Derby[ind] = flux_linkage_Derby(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)#, 50)
+#           phi_Foelsch2[ind] = flux_linkage_Foelsch2_axial(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, 11)#, 50)
+           phi_nasa[ind] = flux_linkage_nasa_axial(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)#, 50)
+#                            flux_linkage_Derby_axial(Br, mag_h, mag_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts): #, parts2):
+#            phi_Derby[ind] = flux_linkage_Derby_axial(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)#, 50)
         plt.plot(dd, phi_nasa, label = "Flux linkage (parts = %2d)" % parts)
 #        plt.plot(dd, phi_Derby, label = "Flux linkage (parts = %2d)" % parts)
         plt.legend(loc=1)
@@ -565,16 +565,16 @@ def test_flux_linkage2():
 #            print "%3d%% done." % (percent)
 #        tmp = flux_linkage_nasa_orig(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)#, 51)
 #        phi_nasa_orig[ind] = tmp
-#        tmp = flux_linkage_nasa(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)#, 51)
+#        tmp = flux_linkage_nasa_axial(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)#, 51)
 #        phi_nasa[ind] = tmp
 
-        tmp = flux_linkage_Derby(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)#, 51)
+        tmp = flux_linkage_Derby_axial(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)#, 51)
         phi_nasa_all[ind] = tmp
         result_csv_file.write("%.8f;%.8f;\n" % (d, tmp))
 
-#        tmp = flux_linkage_Derby(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)#, 51)
+#        tmp = flux_linkage_Derby_axial(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)#, 51)
 #        phi_Derby[ind] = tmp        
-#        tmp = flux_linkage_Foelsch2(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)#, 51)
+#        tmp = flux_linkage_Foelsch2_axial(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)#, 51)
 #        phi_Foelsch2[ind] = tmp
     end = time.time()
     print "Elapsed time : %.2f seconds (%.2f ms/step)" % (end-start, (end-start)/step_no*1000)
@@ -584,8 +584,8 @@ def test_flux_linkage2():
 
     result_csv_file.close()
 
-#    print "z = % .4f, Bz = %.5f," % (dd[0], flux_linkage_nasa(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, dd[0], parts))
-#    print "z = % .4f, Bz = %.5f," % (dd[-1], flux_linkage_nasa(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, dd[-1], parts))
+#    print "z = % .4f, Bz = %.5f," % (dd[0], flux_linkage_nasa_axial(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, dd[0], parts))
+#    print "z = % .4f, Bz = %.5f," % (dd[-1], flux_linkage_nasa_axial(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, dd[-1], parts))
 
     data = np.genfromtxt("flux_N_up.csv", dtype='float', delimiter=';', skip_header = 0)
     z = data[:,0]/1000
@@ -641,7 +641,7 @@ def test_flux_linkage2():
 #    step = 0.0003
 #    d = -m_h/2-step*2; y1 = flux_linkage_nasa_orig(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)
 #    d = -m_h/2-step*1; y2 = flux_linkage_nasa_orig(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)
-##    d = -m_h/2-step*0; y3 = flux_linkage_nasa(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)
+##    d = -m_h/2-step*0; y3 = flux_linkage_nasa_axial(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)
 #    d = -m_h/2+step*1; y4 = flux_linkage_nasa_orig(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)
 #    d = -m_h/2+step*2; y5 = flux_linkage_nasa_orig(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)
 #    tmp = (y5-y1)*5/4/step + (y5+y4-y2-y1)*5/6/step
@@ -702,7 +702,7 @@ def test_flux_linkage_N500():
             sys.stdout.write("Calculation progress: %d%%   \r" % (progress) )
             sys.stdout.flush()
 
-        tmp = flux_linkage_Derby(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)#, 51)
+        tmp = flux_linkage_Derby_axial(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)#, 51)
         phi_nasa_all[ind] = tmp
 
 
@@ -769,29 +769,29 @@ def test_flux_linkage3():
     start = time.time()
     dd = np.arange(-0.01, 0.01, 0.001)
     for d in dd:
-        phi = flux_linkage_nasa(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)#, 51)
+        phi = flux_linkage_nasa_axial(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)#, 51)
         print "d = % .4f, phi = % .5f, diff = %.4e" % (d, phi, d+0.001)
     end = time.time()
     print "Elapsed time : %.2f seconds" % (end-start)    
 
     d = -0.001 + 4.0766e-17
-    phi = flux_linkage_nasa(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)#, 51)
+    phi = flux_linkage_nasa_axial(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)#, 51)
     print "d = % .4f, phi = % .5f" % (d, phi)
     
     d = -0.001 - 4.0766e-17
-    phi = flux_linkage_nasa(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)#, 51)
+    phi = flux_linkage_nasa_axial(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)#, 51)
     print "d = % .4f, phi = % .5f" % (d, phi)
     
     d = -0.001
-    phi = flux_linkage_nasa(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)#, 51)
+    phi = flux_linkage_nasa_axial(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)#, 51)
     print "d = % .4f, phi = % .5f" % (d, phi)
     
     d = 0.0
-    phi = flux_linkage_nasa(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)#, 51)
+    phi = flux_linkage_nasa_axial(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)#, 51)
     print "d = % .4f, phi = % .5f" % (d, phi)
     
     d = 0.001
-    phi = flux_linkage_nasa(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)#, 51)
+    phi = flux_linkage_nasa_axial(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)#, 51)
     print "d = % .4f, phi = % .5f" % (d, phi)
     
 
@@ -819,9 +819,9 @@ def test_flux_linkage5():
     
     start = time.time()
     for i in xrange(1, steps):
-#        phi_Derby[i] = flux_linkage_Derby(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, i)
-        phi_nasa[i] = flux_linkage_nasa(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, i)
-        phi_nasa_all[i] = flux_linkage_nasa_all(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, i)
+#        phi_Derby[i] = flux_linkage_Derby_axial(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, i)
+        phi_nasa[i] = flux_linkage_nasa_axial(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, i)
+        phi_nasa_all[i] = flux_linkage_nasa_axial(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, i)
     end = time.time()
     print "Elapsed time : %.2f seconds" % (end-start)    
 
@@ -871,7 +871,7 @@ def draw_flux_lines():
 
     for i in range(steps):
         for j in range(steps2):
-            Bz_axial  = nasa(Br, m_r, m_h/2, X[i][steps2+j], Y[i][steps2+j])
+            Bz_axial  = nasa_axial(Br, m_r, m_h/2, X[i][steps2+j], Y[i][steps2+j])
             Bz_radial = nasa_radial(Br, m_r, m_h/2, X[i][steps2+j], Y[i][steps2+j]) 
             YY[i][steps2+j] = -Bz_axial
             XX[i][steps2+j] = Bz_radial
@@ -926,7 +926,7 @@ def draw_flux_contour():
 
     for i in range(steps):
         for j in range(steps2):
-            Bz_axial  = nasa(Br, m_r, m_h/2, X[i][steps2+j], Y[i][steps2+j])
+            Bz_axial  = nasa_axial(Br, m_r, m_h/2, X[i][steps2+j], Y[i][steps2+j])
             Bz_radial = nasa_radial(Br, m_r, m_h/2, X[i][steps2+j], Y[i][steps2+j]) 
             YY[i][steps2+j] = -Bz_axial
             XX[i][steps2+j] = Bz_radial
@@ -985,17 +985,17 @@ def test_flux_slice():
     
     print "Almost there!"
     
-    r = 0.0; z =  0/1000; Bz = Derby(m_Br, m_r, m_h/2, r, z); print "r = %5.2f mm, z = %5.2f mm, Bz = % .6f T, diff = %6.2f %%" % (r*1000, z*1000, Bz, (Bz/1.14735-1)*100)
-    r = 0.0; z =  9/1000; Bz = Derby(m_Br, m_r, m_h/2, r, z); print "r = %5.2f mm, z = %5.2f mm, Bz = % .6f T, diff = %6.2f %%" % (r*1000, z*1000, Bz, (Bz/0.686153-1)*100)
-    r = 0.0; z = 10/1000; Bz = Derby(m_Br, m_r, m_h/2, r, z); print "r = %5.2f mm, z = %5.2f mm, Bz = % .6f T, diff = %6.2f %%" % (r*1000, z*1000, Bz, (Bz/0.548088-1)*100)
-    r = 0.0; z = 20/1000; Bz = Derby(m_Br, m_r, m_h/2, r, z); print "r = %5.2f mm, z = %5.2f mm, Bz = % .6f T, diff = %6.2f %%" % (r*1000, z*1000, Bz, (Bz/0.04967-1)*100)
+    r = 0.0; z =  0/1000; Bz = Derby_axial(m_Br, m_r, m_h/2, r, z); print "r = %5.2f mm, z = %5.2f mm, Bz = % .6f T, diff = %6.2f %%" % (r*1000, z*1000, Bz, (Bz/1.14735-1)*100)
+    r = 0.0; z =  9/1000; Bz = Derby_axial(m_Br, m_r, m_h/2, r, z); print "r = %5.2f mm, z = %5.2f mm, Bz = % .6f T, diff = %6.2f %%" % (r*1000, z*1000, Bz, (Bz/0.686153-1)*100)
+    r = 0.0; z = 10/1000; Bz = Derby_axial(m_Br, m_r, m_h/2, r, z); print "r = %5.2f mm, z = %5.2f mm, Bz = % .6f T, diff = %6.2f %%" % (r*1000, z*1000, Bz, (Bz/0.548088-1)*100)
+    r = 0.0; z = 20/1000; Bz = Derby_axial(m_Br, m_r, m_h/2, r, z); print "r = %5.2f mm, z = %5.2f mm, Bz = % .6f T, diff = %6.2f %%" % (r*1000, z*1000, Bz, (Bz/0.04967-1)*100)
     
-    r = 4.0/1000; z =  9/1000; Bz = Derby(m_Br, m_r, m_h/2, r, z); print "r = %5.2f mm, z = %5.2f mm, Bz = % .6f T, diff = %6.2f %%" % (r*1000, z*1000, Bz, (Bz/0.796188-1)*100)
-    r = 5.0/1000; z =  9/1000; Bz = Derby(m_Br, m_r, m_h/2, r, z); print "r = %5.2f mm, z = %5.2f mm, Bz = % .6f T, diff = %6.2f %%" % (r*1000, z*1000, Bz, (Bz/-0.190783-1)*100)
-    r = 4.0/1000; z = 10/1000; Bz = Derby(m_Br, m_r, m_h/2, r, z); print "r = %5.2f mm, z = %5.2f mm, Bz = % .6f T, diff = %6.2f %%" % (r*1000, z*1000, Bz, (Bz/0.451361-1)*100)
-    r = 5.0/1000; z = 10/1000; Bz = Derby(m_Br, m_r, m_h/2, r, z); print "r = %5.2f mm, z = %5.2f mm, Bz = % .6f T, diff = %6.2f %%" % (r*1000, z*1000, Bz, (Bz/0.147657-1)*100)
-    r = 8.0/1000; z =  9/1000; Bz = Derby(m_Br, m_r, m_h/2, r, z); print "r = %5.2f mm, z = %5.2f mm, Bz = % .6f T, diff = %6.2f %%" % (r*1000, z*1000, Bz, (Bz/-0.0277362-1)*100)
-    r = 8.0/1000; z = 10/1000; Bz = Derby(m_Br, m_r, m_h/2, r, z); print "r = %5.2f mm, z = %5.2f mm, Bz = % .6f T, diff = %6.2f %%" % (r*1000, z*1000, Bz, (Bz/-0.00605788-1)*100)
+    r = 4.0/1000; z =  9/1000; Bz = Derby_axial(m_Br, m_r, m_h/2, r, z); print "r = %5.2f mm, z = %5.2f mm, Bz = % .6f T, diff = %6.2f %%" % (r*1000, z*1000, Bz, (Bz/0.796188-1)*100)
+    r = 5.0/1000; z =  9/1000; Bz = Derby_axial(m_Br, m_r, m_h/2, r, z); print "r = %5.2f mm, z = %5.2f mm, Bz = % .6f T, diff = %6.2f %%" % (r*1000, z*1000, Bz, (Bz/-0.190783-1)*100)
+    r = 4.0/1000; z = 10/1000; Bz = Derby_axial(m_Br, m_r, m_h/2, r, z); print "r = %5.2f mm, z = %5.2f mm, Bz = % .6f T, diff = %6.2f %%" % (r*1000, z*1000, Bz, (Bz/0.451361-1)*100)
+    r = 5.0/1000; z = 10/1000; Bz = Derby_axial(m_Br, m_r, m_h/2, r, z); print "r = %5.2f mm, z = %5.2f mm, Bz = % .6f T, diff = %6.2f %%" % (r*1000, z*1000, Bz, (Bz/0.147657-1)*100)
+    r = 8.0/1000; z =  9/1000; Bz = Derby_axial(m_Br, m_r, m_h/2, r, z); print "r = %5.2f mm, z = %5.2f mm, Bz = % .6f T, diff = %6.2f %%" % (r*1000, z*1000, Bz, (Bz/-0.0277362-1)*100)
+    r = 8.0/1000; z = 10/1000; Bz = Derby_axial(m_Br, m_r, m_h/2, r, z); print "r = %5.2f mm, z = %5.2f mm, Bz = % .6f T, diff = %6.2f %%" % (r*1000, z*1000, Bz, (Bz/-0.00605788-1)*100)
 
 
     
@@ -1258,10 +1258,10 @@ def main():
 #    x1 = -10
 #    x2 = 30
 #    print "Br = %.1f T, coil_r = %.1f mm, r = %.1f mm, h_mag/2 = %.1f mm, x = %.1f mm" % (Br, coil_r*1000, r*1000, a*1000, x*1000)
-    Bz_Foelsch1 = Foelsch1(Br, coil_r, a, r, x)
-    Bz_Foelsch2 = Foelsch2(Br, coil_r, a, r, x)
-    Bz_nasa = nasa(Br, coil_r, a, r, x)
-    Bz_derby = Derby(Br, coil_r, a, r, x)
+    Bz_Foelsch1 = Foelsch1_axial(Br, coil_r, a, r, x)
+    Bz_Foelsch2 = Foelsch2_axial(Br, coil_r, a, r, x)
+    Bz_nasa = nasa_axial(Br, coil_r, a, r, x)
+    Bz_derby = Derby_axial(Br, coil_r, a, r, x)
 
 #    print "Bz_Foelsch1 = % 1.20f" % (Bz_Foelsch1)
 #    print "Bz_Foelsch2 = % 1.20f" % (Bz_Foelsch2)
