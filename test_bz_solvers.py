@@ -568,7 +568,7 @@ def test_flux_linkage2():
 #        tmp = flux_linkage_nasa(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)#, 51)
 #        phi_nasa[ind] = tmp
 
-        tmp = flux_linkage_Derby_all(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)#, 51)
+        tmp = flux_linkage_Derby(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)#, 51)
         phi_nasa_all[ind] = tmp
         result_csv_file.write("%.8f;%.8f;\n" % (d, tmp))
 
@@ -702,7 +702,7 @@ def test_flux_linkage_N500():
             sys.stdout.write("Calculation progress: %d%%   \r" % (progress) )
             sys.stdout.flush()
 
-        tmp = flux_linkage_Derby_all(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)#, 51)
+        tmp = flux_linkage_Derby(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)#, 51)
         phi_nasa_all[ind] = tmp
 
 
@@ -794,26 +794,6 @@ def test_flux_linkage3():
     phi = flux_linkage_nasa(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)#, 51)
     print "d = % .4f, phi = % .5f" % (d, phi)
     
-
-def test_flux_linkage4(z, parts):
-    coil_r1 = 12.05 / 2 / 1000   # inner radius of the coil = 12.05/2 mm 
-    coil_r2 = 25.8 / 2 / 1000  # outer radios of the coil = 25.3/2 mm
-    coil_h = 6.2 / 1000 # coil height is 6.2 mm
-
-    # Parameters for prototype 3
-    N = 3000  # number of turns
-#    m_D = 12 / 1000 # diameter of the magnet = 9.525 mm
-#    m_D = 9.525 / 1000 # diameter of the magnet = 9.525 mm
-    m_D = 9.35 / 1000 # diameter of the magnet = 9.525 mm
-    m_r = m_D/2
-    m_h = 19.05 / 1000 # lenngth of the magnet = 19.05 mm
-    m_Br = 1.2
-    
-    k_co = 0.55277
-    d_co = 100e-6
-    
-    FL = flux_linkage_Derby(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, z, parts)
-    print "z = %5.2f, FL = %.3e Webers" % (z*1000, FL)
 
 def test_flux_linkage5():
     coil_r1 = 12.05 / 2 / 1000   # inner radius of the coil = 12.05/2 mm 

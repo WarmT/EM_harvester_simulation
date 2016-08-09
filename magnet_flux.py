@@ -428,48 +428,9 @@ def flux_linkage_nasa_all(Br, mag_h, mag_r, coil_h, coil_r1, coil_r2, k_co, d_co
             r += dr
         z += dz
     return phi
-
-def flux_linkage_Derby(Br, mag_h, mag_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts):
-    Nz = 2 * coil_h / (d_co * np.sqrt(np.pi/k_co))
-    Nr  = 2 * (coil_r2 - coil_r1) / (d_co * np.sqrt(np.pi/k_co))
-    dN = Nz * Nr / (parts * parts)
-    
-    phi = 0.0
-    dz = coil_h / parts
-    dz2 = dz / 2
-    z = d - coil_h/2 + dz2
-    for j in xrange(parts):
-        r = 0
-        dphi = 0.0
-
-        dr = mag_r / parts
-        dr2 = dr / 2
-        for i in xrange(parts):
-            Bz = Derby(Br, mag_r, mag_h/2, r+dr2, z)
-            dphi += Bz * np.pi * ( (r+dr)*(r+dr) - r*r )
-            phi += dphi
-            r += dr
-            
-        dr = (coil_r1 - mag_r) / parts
-        dr2 = dr / 2
-        for i in xrange(parts):
-            Bz = Derby(Br, mag_r, mag_h/2, r+dr2, z)
-            dphi += Bz * np.pi * ( (r+dr)*(r+dr) - r*r )
-            phi += dphi
-            r += dr
-
-        dr = (coil_r2 - coil_r1) / parts
-        dr2 = dr / 2
-        for i in xrange(parts):
-            Bz = Derby(Br, mag_r, mag_h/2, r+dr2, z)
-            dphi += Bz * np.pi * ( (r+dr)*(r+dr) - r*r )
-            phi += dN * dphi
-            r += dr
-        z += dz
-    return phi
     
 @jit
-def flux_linkage_Derby_all(Br, mag_h, mag_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts):
+def flux_linkage_Derby(Br, mag_h, mag_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts):
     Nz_float = 2 * coil_h / (d_co * np.sqrt(np.pi/k_co))
     Nr_float = 2 * (coil_r2 - coil_r1) / (d_co * np.sqrt(np.pi/k_co))
     Nr = int(round(Nr_float))
@@ -518,8 +479,8 @@ def calc_flux_gradient(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, N, d_co, d):
 
     step = coil_h / Nz
     
-    y1 = flux_linkage_Derby_all(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d-step, parts)
-    y2 = flux_linkage_Derby_all(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d+step, parts)
+    y1 = flux_linkage_Derby(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d-step, parts)
+    y2 = flux_linkage_Derby(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d+step, parts)
     k = ( y2 - y1 ) / (2*step)
     
     return k
@@ -537,8 +498,8 @@ def calc_power_orig(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, t0, re
     N = int(round( 4.0 * coil_h * (coil_r2 - coil_r1) * k_co / (d_co*d_co*np.pi) ))
     print "Nz = %d, Nr = %d, N = %d" % (Nz, Nr, N)
     step = coil_h / Nz
-    d = -(m_h+coil_h)/2+t0-step; y1 = flux_linkage_Derby_all(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)
-    d = -(m_h+coil_h)/2+t0+step; y2 = flux_linkage_Derby_all(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)
+    d = -(m_h+coil_h)/2+t0-step; y1 = flux_linkage_Derby(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)
+    d = -(m_h+coil_h)/2+t0+step; y2 = flux_linkage_Derby(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)
     k = ( y2 - y1 ) / (2*step)
     
 #    print "Nz = %d, Nr = %d, N = %d" % (round(Nz), round(Nr), round(N))
@@ -574,8 +535,8 @@ def calc_power(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, N, d_co, t0, a, f):
     k_co = np.pi * d_co * d_co * N / ( 4 * coil_h * ( coil_r2 - coil_r1 ) )
     
     step = coil_h / 100
-    d = -(m_h+coil_h)/2+t0-step; y1 = flux_linkage_Derby_all(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)
-    d = -(m_h+coil_h)/2+t0+step; y2 = flux_linkage_Derby_all(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)
+    d = -(m_h+coil_h)/2+t0-step; y1 = flux_linkage_Derby(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)
+    d = -(m_h+coil_h)/2+t0+step; y2 = flux_linkage_Derby(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)
     k = ( y2 - y1 ) / (2*step)
     
 #    print "Nz = %d, Nr = %d, N = %d" % (round(Nz), round(Nr), round(N))
@@ -607,8 +568,8 @@ def calc_power_all(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, N, d_co, t0, a, f):
     k_co = np.pi * d_co * d_co * N / ( 4 * coil_h * ( coil_r2 - coil_r1 ) )
     
     step = coil_h / 100
-    d = -(m_h+coil_h)/2+t0-step; y1 = flux_linkage_Derby_all(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)
-    d = -(m_h+coil_h)/2+t0+step; y2 = flux_linkage_Derby_all(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)
+    d = -(m_h+coil_h)/2+t0-step; y1 = flux_linkage_Derby(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)
+    d = -(m_h+coil_h)/2+t0+step; y2 = flux_linkage_Derby(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)
     k = ( y2 - y1 ) / (2*step)
     
 #    print "Nz = %d, Nr = %d, N = %d" % (round(Nz), round(Nr), round(N))
@@ -639,8 +600,8 @@ def calc_power_all_two_coils(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, N, d_co, 
     k_co = np.pi * d_co * d_co * N / ( 4 * coil_h * ( coil_r2 - coil_r1 ) )
     
     step = coil_h / 100
-    d = -(m_h+coil_h)/2+t0-step; y1 = flux_linkage_Derby_all(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)
-    d = -(m_h+coil_h)/2+t0+step; y2 = flux_linkage_Derby_all(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)
+    d = -(m_h+coil_h)/2+t0-step; y1 = flux_linkage_Derby(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)
+    d = -(m_h+coil_h)/2+t0+step; y2 = flux_linkage_Derby(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)
 #    k = ( y2 - y1 ) / (2*step)
     k = ( y2 - y1 ) / (step) # k is now doubled !!!!!!!!
     
@@ -672,8 +633,8 @@ def calc_power_two_coils(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, N, d_co, t0, 
     k_co = np.pi * d_co * d_co * N / ( 4 * coil_h * ( coil_r2 - coil_r1 ) )
     
     step = coil_h / 100
-    d = -(m_h+coil_h)/2+t0-step; y1 = flux_linkage_Derby_all(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)
-    d = -(m_h+coil_h)/2+t0+step; y2 = flux_linkage_Derby_all(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)
+    d = -(m_h+coil_h)/2+t0-step; y1 = flux_linkage_Derby(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)
+    d = -(m_h+coil_h)/2+t0+step; y2 = flux_linkage_Derby(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)
 #    k = ( y2 - y1 ) / (2*step)
     k = ( y2 - y1 ) / (step) # k is now doubled !!!!!!!!
     
@@ -706,8 +667,8 @@ def calc_power_print(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, N, d_co, t0, a, f
     k_co = np.pi * d_co * d_co * N / ( 4 * coil_h * ( coil_r2 - coil_r1 ) )
     
     step = coil_h / 100
-    d = -(m_h+coil_h)/2+t0-step; y1 = flux_linkage_Derby_all(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)
-    d = -(m_h+coil_h)/2+t0+step; y2 = flux_linkage_Derby_all(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)
+    d = -(m_h+coil_h)/2+t0-step; y1 = flux_linkage_Derby(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)
+    d = -(m_h+coil_h)/2+t0+step; y2 = flux_linkage_Derby(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)
     k = ( y2 - y1 ) / (2*step)
     
 #    print "Nz = %d, Nr = %d, N = %d" % (round(Nz), round(Nr), round(N))
