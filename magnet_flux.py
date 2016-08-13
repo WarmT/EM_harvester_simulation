@@ -181,11 +181,11 @@ def Foelsch1_axial(Br, a, b, r, z):
     sqrt1n = np.sqrt(1 - n)
 
     if r <= a:
-        A1 = (float(elliptic_k(m1)) + float(elliptic_pi(n, m1)) * sqrt1n) * np.sqrt(1 - beta1)  # noqa
-        A2 = (float(elliptic_k(m2)) + float(elliptic_pi(n, m2)) * sqrt1n) * np.sqrt(1 - beta2)  # noqa
+        A1 = (float(elliptic_k(m1)) + float(elliptic_pi(n, m1)) * sqrt1n) * np.sqrt(1 - beta1)
+        A2 = (float(elliptic_k(m2)) + float(elliptic_pi(n, m2)) * sqrt1n) * np.sqrt(1 - beta2)
     else:
-        A1 = (float(elliptic_k(m1)) - float(elliptic_pi(n, m1)) * sqrt1n) * np.sqrt(1 - beta1)  # noqa
-        A2 = (float(elliptic_k(m2)) - float(elliptic_pi(n, m2)) * sqrt1n) * np.sqrt(1 - beta2)  # noqa
+        A1 = (float(elliptic_k(m1)) - float(elliptic_pi(n, m1)) * sqrt1n) * np.sqrt(1 - beta1)
+        A2 = (float(elliptic_k(m2)) - float(elliptic_pi(n, m2)) * sqrt1n) * np.sqrt(1 - beta2)
 
     if (z >= -b) and (z <= b):
         BZ = Br * (A2 + A1) / (2 * np.pi)
@@ -239,7 +239,7 @@ def Foelsch2_axial(Br, a, b, r, z):
         Finc = 10e20
     Einc = ellipeinc(phi1, sin2b1)
 
-    A1 = np.pi / 2 + K1 * np.sqrt(1 - beta1) * (1 + np.sqrt(1 - n)) + Finc * (K1 - E1) - K1 * Einc  # noqa
+    A1 = np.pi / 2 + K1 * np.sqrt(1 - beta1) * (1 + np.sqrt(1 - n)) + Finc * (K1 - E1) - K1 * Einc
     B1 = 2 * K1 * np.sqrt(1 - beta1) - A1
 
     if m2 == 1:
@@ -252,7 +252,7 @@ def Foelsch2_axial(Br, a, b, r, z):
     Finc = ellipkinc(phi2, sin2b2)
     if Finc == np.inf:
         Finc = 10e20
-    A2 = np.pi / 2 + K2 * np.sqrt(1 - beta2) * (1 + np.sqrt(1 - n)) + Finc * (K2 - E2) - K2 * Einc  # noqa
+    A2 = np.pi / 2 + K2 * np.sqrt(1 - beta2) * (1 + np.sqrt(1 - n)) + Finc * (K2 - E2) - K2 * Einc
     B2 = 2 * K2 * np.sqrt(1 - beta2) - A2
 
     if r <= a:
@@ -310,8 +310,7 @@ def Derby_axial(Br, a, b, r, z):
 
 
 @jit
-def flux_linkage_Foelsch2_axial(Br, mag_h, mag_r, coil_h, coil_r1, coil_r2,
-                                k_co, d_co, d, parts):
+def flux_linkage_Foelsch2_axial(Br, mag_h, mag_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts):
     Nz = 2 * coil_h / (d_co * np.sqrt(np.pi / k_co))
     Nr = 2 * (coil_r2 - coil_r1) / (d_co * np.sqrt(np.pi / k_co))
     dN = Nz * Nr / (parts * parts)
@@ -351,8 +350,7 @@ def flux_linkage_Foelsch2_axial(Br, mag_h, mag_r, coil_h, coil_r1, coil_r2,
 
 
 @jit
-def flux_linkage_nasa_axial(Br, mag_h, mag_r, coil_h, coil_r1, coil_r2,
-                            k_co, d_co, d, parts):
+def flux_linkage_nasa_axial(Br, mag_h, mag_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts):
     Nz_float = 2 * coil_h / (d_co * np.sqrt(np.pi / k_co))
     Nr_float = 2 * (coil_r2 - coil_r1) / (d_co * np.sqrt(np.pi / k_co))
     Nr = int(round(Nr_float))
@@ -460,9 +458,9 @@ def calc_power(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, N, d_co, t0, a, f):
 
     step = coil_h / 100
     d = -(m_h + coil_h) / 2 + t0 - step
-    y1 = flux_linkage_Derby_axial(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)  # noqa
+    y1 = flux_linkage_Derby_axial(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)
     d = -(m_h + coil_h) / 2 + t0 + step
-    y2 = flux_linkage_Derby_axial(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)  # noqa
+    y2 = flux_linkage_Derby_axial(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)
     k = (y2 - y1) / (2 * step)
 
     resistivity = 1.709e-8 / (d_co * d_co * np.pi / 4)
@@ -487,16 +485,16 @@ def calc_power(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, N, d_co, t0, a, f):
 
 
 @jit
-def calc_power_all(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, N, d_co, t0, a, f):  # noqa
+def calc_power_all(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, N, d_co, t0, a, f):
     parts = 12
 
     k_co = np.pi * d_co * d_co * N / (4 * coil_h * (coil_r2 - coil_r1))
 
     step = coil_h / 100
     d = -(m_h + coil_h) / 2 + t0 - step
-    y1 = flux_linkage_Derby_axial(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)  # noqa
+    y1 = flux_linkage_Derby_axial(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)
     d = -(m_h + coil_h) / 2 + t0 + step
-    y2 = flux_linkage_Derby_axial(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)  # noqa
+    y2 = flux_linkage_Derby_axial(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)
     k = (y2 - y1) / (2 * step)
 
 #    print "Nz = %d, Nr = %d, N = %d" % (round(Nz), round(Nr), round(N))
@@ -522,16 +520,16 @@ def calc_power_all(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, N, d_co, t0, a, f):
 
 
 @jit
-def calc_power_all_two_coils(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, N, d_co, t0, a, f):  # noqa
+def calc_power_all_two_coils(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, N, d_co, t0, a, f):
     parts = 12
 
     k_co = np.pi * d_co * d_co * N / (4 * coil_h * (coil_r2 - coil_r1))
 
     step = coil_h / 100
     d = -(m_h + coil_h) / 2 + t0 - step
-    y1 = flux_linkage_Derby_axial(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)  # noqa
+    y1 = flux_linkage_Derby_axial(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)
     d = -(m_h + coil_h) / 2 + t0 + step
-    y2 = flux_linkage_Derby_axial(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)  # noqa
+    y2 = flux_linkage_Derby_axial(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)
     k = (y2 - y1) / (step)  # k is now doubled !!!!!!!!
 
     resistivity = 1.709e-8 / (d_co * d_co * np.pi / 4)
@@ -556,16 +554,16 @@ def calc_power_all_two_coils(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, N, d_co, 
 
 
 @jit
-def calc_power_two_coils(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, N, d_co, t0, a, f):  # noqa
+def calc_power_two_coils(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, N, d_co, t0, a, f):
     parts = 12
 
     k_co = np.pi * d_co * d_co * N / (4 * coil_h * (coil_r2 - coil_r1))
 
     step = coil_h / 100
     d = -(m_h + coil_h) / 2 + t0 - step
-    y1 = flux_linkage_Derby_axial(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)  # noqa
+    y1 = flux_linkage_Derby_axial(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)
     d = -(m_h + coil_h) / 2 + t0 + step
-    y2 = flux_linkage_Derby_axial(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)  # noqa
+    y2 = flux_linkage_Derby_axial(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)
     k = (y2 - y1) / (step)  # k is now doubled !!!!!!!!
 
     resistivity = 1.709e-8 / (d_co * d_co * np.pi / 4)
@@ -621,7 +619,7 @@ def draw_flux_lines_coil(outfile, m_Br, m_r, m_h, coil_r1, coil_r2, coil_h, N, d
 
     offset = 0.3e-3
 
-    coil_h  *= 1000  # noqa
+    coil_h  *= 1000
     coil_r1 *= 1000
     coil_r2 *= 1000
     m_r     *= 1000
