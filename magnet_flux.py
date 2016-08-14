@@ -456,7 +456,9 @@ def calc_power(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, N, d_co, t0, a, f):
 
     k_co = np.pi * d_co * d_co * N / (4 * coil_h * (coil_r2 - coil_r1))
 
-    step = coil_h / 100
+    Nz = int(round(2.0 * coil_h / (d_co * np.sqrt(np.pi / k_co))))
+    step = coil_h / Nz
+
     d = -(m_h + coil_h) / 2 + t0 - step
     y1 = flux_linkage_Derby_axial(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)
     d = -(m_h + coil_h) / 2 + t0 + step
@@ -490,7 +492,9 @@ def calc_power_all(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, N, d_co, t0, a, f):
 
     k_co = np.pi * d_co * d_co * N / (4 * coil_h * (coil_r2 - coil_r1))
 
-    step = coil_h / 100
+    Nz = int(round(2.0 * coil_h / (d_co * np.sqrt(np.pi / k_co))))
+    step = coil_h / Nz
+
     d = -(m_h + coil_h) / 2 + t0 - step
     y1 = flux_linkage_Derby_axial(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)
     d = -(m_h + coil_h) / 2 + t0 + step
@@ -525,7 +529,9 @@ def calc_power_all_two_coils(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, N, d_co, 
 
     k_co = np.pi * d_co * d_co * N / (4 * coil_h * (coil_r2 - coil_r1))
 
-    step = coil_h / 100
+    Nz = int(round(2.0 * coil_h / (d_co * np.sqrt(np.pi / k_co))))
+    step = coil_h / Nz
+
     d = -(m_h + coil_h) / 2 + t0 - step
     y1 = flux_linkage_Derby_axial(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)
     d = -(m_h + coil_h) / 2 + t0 + step
@@ -559,7 +565,9 @@ def calc_power_two_coils(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, N, d_co, t0, 
 
     k_co = np.pi * d_co * d_co * N / (4 * coil_h * (coil_r2 - coil_r1))
 
-    step = coil_h / 100
+    Nz = int(round(2.0 * coil_h / (d_co * np.sqrt(np.pi / k_co))))
+    step = coil_h / Nz
+
     d = -(m_h + coil_h) / 2 + t0 - step
     y1 = flux_linkage_Derby_axial(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)
     d = -(m_h + coil_h) / 2 + t0 + step
