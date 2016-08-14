@@ -119,7 +119,7 @@ def nasa_axial(Br, a, b, r, z):
                 (z1 / np.pi * np.sqrt(m1 / (a * r)) * ellipk(m1) +
                  (a - r) * z1 / abs((a - r) * z1) * Heuman_Lambda(phi1, m1) -
                  (z2 / np.pi * np.sqrt(m2 / (a * r)) * ellipk(m2) +
-                 (a - r) * z2 / abs((a - r) * z2) * Heuman_Lambda(phi2, m2)))
+                  (a - r) * z2 / abs((a - r) * z2) * Heuman_Lambda(phi2, m2)))
 
     return BZ
 
@@ -607,7 +607,7 @@ def draw_flux_lines_coil(outfile, m_Br, m_r, m_h, coil_r1, coil_r2, coil_h, N, d
 
     for i in range(steps):
         for j in range(steps2):
-            Bz_axial = nasa_axial(Br, m_r, m_h / 2, X[i][steps2 + j], Y[i][steps2 + j])  # noqa
+            Bz_axial = nasa_axial(Br, m_r, m_h / 2, X[i][steps2 + j], Y[i][steps2 + j])
             B[i][steps2 + j] = -Bz_axial
             B[i][steps2 - j] = -Bz_axial
 
@@ -619,44 +619,62 @@ def draw_flux_lines_coil(outfile, m_Br, m_r, m_h, coil_r1, coil_r2, coil_h, N, d
 
     offset = 0.3e-3
 
-    coil_h  *= 1000
+    coil_h *= 1000
     coil_r1 *= 1000
     coil_r2 *= 1000
-    m_r     *= 1000
-    m_h     *= 1000
-    offset  *= 1000
-    t0      *= 1000
-    xmax    *= 950
-    ymax    *= 950
+    m_r *= 1000
+    m_h *= 1000
+    offset *= 1000
+    t0 *= 1000
+    xmax *= 950
+    ymax *= 950
 
     ax = plt.gca()
-    ax.add_patch(patches.Rectangle((-coil_r2, m_h / 2 - t0), coil_r2 - coil_r1, coil_h, facecolor='yellow', alpha=0.2))  # noqa
-    ax.text(-(coil_r2 + coil_r1) / 2, m_h / 2 - t0 + 0.8 * coil_h, "Coil", ha='center', fontsize=24)  # noqa
-    ax.add_patch(patches.Rectangle((coil_r1, m_h / 2 - t0), coil_r2 - coil_r1, coil_h, facecolor='yellow', alpha=0.2))  # noqa
+    ax.add_patch(patches.Rectangle((-coil_r2, m_h / 2 - t0), coil_r2 - coil_r1, coil_h,
+                                   facecolor='yellow', alpha=0.2))
+    ax.text(-(coil_r2 + coil_r1) / 2, m_h / 2 - t0 + 0.8 * coil_h,
+            "Coil", ha='center', fontsize=24)
+    ax.add_patch(patches.Rectangle((coil_r1, m_h / 2 - t0), coil_r2 - coil_r1, coil_h,
+                                   facecolor='yellow', alpha=0.2))
 
-    ax.annotate("", [-coil_r2, m_h / 2 - t0 - 4 * offset], [0, m_h / 2 - t0 - 4 * offset], arrowprops=dict(lw=2, color='blue', arrowstyle='<->', mutation_scale=20))  # noqa
-    ax.text(-coil_r2 / 2, m_h / 2 - t0 - 3 * offset, "%.2f mm" % (coil_r2), ha='center', color='blue', fontsize=16)  # noqa
+    ax.annotate("", [-coil_r2, m_h / 2 - t0 - 4 * offset], [0, m_h / 2 - t0 - 4 * offset],
+                arrowprops=dict(lw=2, color='blue', arrowstyle='<->', mutation_scale=20))
+    ax.text(-coil_r2 / 2, m_h / 2 - t0 - 3 * offset, "%.2f mm" % (coil_r2),
+            ha='center', color='blue', fontsize=16)
 
-    ax.annotate("", [-coil_r1, m_h / 2 - t0 + 5 * offset], [0, m_h / 2 - t0 + 5 * offset], arrowprops=dict(lw=2, color='blue', arrowstyle='<->'))  # noqa
-    ax.text(-coil_r1 / 2, m_h / 2 - t0 + 6 * offset, "%.2f mm" % (coil_r1), ha='center', color='blue', fontsize=16)  # noqa
+    ax.annotate("", [-coil_r1, m_h / 2 - t0 + 5 * offset], [0, m_h / 2 - t0 + 5 * offset],
+                arrowprops=dict(lw=2, color='blue', arrowstyle='<->'))
+    ax.text(-coil_r1 / 2, m_h / 2 - t0 + 6 * offset, "%.2f mm" % (coil_r1),
+            ha='center', color='blue', fontsize=16)
 
-    ax.annotate("", [-m_r, -m_h / 2], [0, -m_h / 2], arrowprops=dict(lw=2, color='blue', arrowstyle='<->'))  # noqa
-    ax.text(-m_r / 2, -m_h / 2 + offset, "%.2f mm" % (m_r), ha='center', color='blue', fontsize=16)  # noqa
+    ax.annotate("", [-m_r, -m_h / 2], [0, -m_h / 2],
+                arrowprops=dict(lw=2, color='blue', arrowstyle='<->'))
+    ax.text(-m_r / 2, -m_h / 2 + offset, "%.2f mm" % (m_r),
+            ha='center', color='blue', fontsize=16)
 
-    ax.annotate("", [0, -m_h / 2], [0, m_h / 2], arrowprops=dict(lw=2, color='blue', arrowstyle='<->'))  # noqa
+    ax.annotate("", [0, -m_h / 2], [0, m_h / 2],
+                arrowprops=dict(lw=2, color='blue', arrowstyle='<->'))
     ax.text(offset, 0, "%.2f mm" % (m_h), ha='left', color='blue', fontsize=16)
 
-    ax.annotate("", [-coil_r2 + offset, m_h / 2 - t0], [-coil_r2 + offset, m_h / 2 - t0 + coil_h], arrowprops=dict(lw=2, color='blue', arrowstyle='<->'))  # noqa
-    ax.text(-coil_r2 + 2 * offset, m_h / 2 - t0 + coil_h / 2, "%.2f mm" % (coil_h), ha='left', color='blue', fontsize=16)  # noqa
+    ax.annotate("", [-coil_r2 + offset, m_h / 2 - t0], [-coil_r2 + offset, m_h / 2 - t0 + coil_h],
+                arrowprops=dict(lw=2, color='blue', arrowstyle='<->'))
+    ax.text(-coil_r2 + 2 * offset, m_h / 2 - t0 + coil_h / 2, "%.2f mm" % (coil_h),
+            ha='left', color='blue', fontsize=16)
 
-    ax.annotate("", [-coil_r1 - offset, m_h / 2 - t0], [-coil_r1 - offset, m_h / 2], arrowprops=dict(lw=2, color='blue', arrowstyle='<->'))  # noqa
-    ax.text(-coil_r1 - 2 * offset, m_h / 2 - t0 / 2, "%.2f mm" % (t0), ha='right', color='blue', fontsize=16)  # noqa
+    ax.annotate("", [-coil_r1 - offset, m_h / 2 - t0], [-coil_r1 - offset, m_h / 2],
+                arrowprops=dict(lw=2, color='blue', arrowstyle='<->'))
+    ax.text(-coil_r1 - 2 * offset, m_h / 2 - t0 / 2, "%.2f mm" % (t0),
+            ha='right', color='blue', fontsize=16)
 
     if two_coils:
-        ax.add_patch(patches.Rectangle((-coil_r2, -m_h / 2 + t0 - coil_h), coil_r2 - coil_r1, coil_h, facecolor='yellow', alpha=0.2))  # noqa
-        ax.add_patch(patches.Rectangle((coil_r1, -m_h / 2 + t0 - coil_h), coil_r2 - coil_r1, coil_h, facecolor='yellow', alpha=0.2))  # noqa
+        ax.add_patch(patches.Rectangle((-coil_r2, -m_h / 2 + t0 - coil_h), coil_r2 - coil_r1,
+                                       coil_h, facecolor='yellow', alpha=0.2))
+        ax.add_patch(patches.Rectangle((coil_r1, -m_h / 2 + t0 - coil_h), coil_r2 - coil_r1,
+                                       coil_h, facecolor='yellow', alpha=0.2))
 
-    title = r"$B_r = %.1f\,\mathrm{T},\,N = %d,\,d_\mathrm{co} = %d\,\mathrm{um},\,P_\mathrm{max} = %.1f\,\mathrm{mW}$" % (m_Br, N, int(round(d_co*1e6)), P_max)  # noqa
+    title = r"$B_r = %.1f\,\mathrm{T},\,N = %d,\,d_\mathrm{co} = %d\,\mathrm{um},\," + \
+            r"P_\mathrm{max} = %.1f\,\mathrm{mW}$" % (m_Br, N, int(round(d_co * 1e6)), P_max)
+
     plt.title(title)
     plt.axis([-xmax, xmax, -ymax, ymax])
     plt.xlabel("(mm)")
