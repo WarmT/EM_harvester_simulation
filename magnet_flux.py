@@ -680,8 +680,8 @@ def draw_flux_lines_coil(outfile, m_Br, m_r, m_h, coil_r1, coil_r2, coil_h, N, d
         ax.add_patch(patches.Rectangle((coil_r1, -m_h / 2 + t0 - coil_h), coil_r2 - coil_r1,
                                        coil_h, facecolor='yellow', alpha=0.2))
 
-    title = r"$B_r = %.1f\,\mathrm{T},\,N = %d,\,d_\mathrm{co} = %d\,\mathrm{um},\," + \
-            r"P_\mathrm{max} = %.1f\,\mathrm{mW}$" % (m_Br, N, int(round(d_co * 1e6)), P_max)
+    title = (r"$B_r = %.1f\,\mathrm{T},\,N = %d,\,d_\mathrm{co} = %d\,\mathrm{um},\,$" +
+             r"$P_\mathrm{max} = %.1f\,\mathrm{mW}$") % (m_Br, N, int(round(d_co * 1e6)), P_max)
 
     plt.title(title)
     plt.axis([-xmax, xmax, -ymax, ymax])
