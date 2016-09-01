@@ -327,7 +327,7 @@ def flux_linkage_Foelsch2_axial(Br, mag_h, mag_r, coil_h, coil_r1, coil_r2, k_co
         dr2 = dr / 2
         for i in xrange(parts):
             Bz = Foelsch2_axial(Br, mag_r, mag_h / 2, r + dr2, z)
-            dFL += Bz * np.pi * ((r + dr) * (r + dr) - r * r)
+            dFL += Bz * np.pi * 2 * (r + dr2) * dr
             r += dr
         r += dr / 100
 
@@ -335,14 +335,14 @@ def flux_linkage_Foelsch2_axial(Br, mag_h, mag_r, coil_h, coil_r1, coil_r2, k_co
         dr2 = dr / 2
         for i in xrange(parts):
             Bz = Foelsch2_axial(Br, mag_r, mag_h / 2, r + dr2, z)
-            dFL += Bz * np.pi * ((r + dr) * (r + dr) - r * r)
+            dFL += Bz * np.pi * 2 * (r + dr2) * dr
             r += dr
 
         dr = (coil_r2 - coil_r1) / parts
         dr2 = dr / 2
         for i in xrange(parts):
             Bz = Foelsch2_axial(Br, mag_r, mag_h / 2, r + dr2, z)
-            dFL += Bz * np.pi * ((r + dr) * (r + dr) - r * r)
+            dFL += Bz * np.pi * 2 * (r + dr2) * dr
             FL += dN * dFL
             r += dr
         z += dz
@@ -358,33 +358,30 @@ def flux_linkage_nasa_axial(Br, mag_h, mag_r, coil_h, coil_r1, coil_r2, k_co, d_
     dN = Nz_float / Nz * Nr_float / Nr
 
     FL = 0.0
-#    dz = coil_h / parts
-    dz = coil_h / (Nz)
-    dz2 = dz / 2
-    z = d - coil_h / 2 + dz2
+    dz = coil_h / Nz
+    z = d - coil_h / 2 + dz / 2
     for j in xrange(Nz):
-        r = 0
         dFL = 0.0
 
         dr = mag_r / parts
-        dr2 = dr / 2
+        r = dr / 2
         for i in xrange(parts):
-            Bz = nasa_axial(Br, mag_r, mag_h / 2, r + dr2, z)
-            dFL += Bz * np.pi * ((r + dr) * (r + dr) - r * r)
+            Bz = nasa_axial(Br, mag_r, mag_h / 2, r, z)
+            dFL += Bz * np.pi * 2 * r * dr
             r += dr
 
         dr = (coil_r1 - mag_r) / parts
-        dr2 = dr / 2
+        r = mag_r + dr / 2
         for i in xrange(parts):
-            Bz = nasa_axial(Br, mag_r, mag_h / 2, r + dr2, z)
-            dFL += Bz * np.pi * ((r + dr) * (r + dr) - r * r)
+            Bz = nasa_axial(Br, mag_r, mag_h / 2, r, z)
+            dFL += Bz * np.pi * 2 * r * dr
             r += dr
 
         dr = (coil_r2 - coil_r1) / Nr
-        dr2 = dr / 2
+        r = coil_r1 + dr / 2
         for i in xrange(Nr):
-            Bz = nasa_axial(Br, mag_r, mag_h / 2, r + dr2, z)
-            dFL += Bz * np.pi * ((r + dr) * (r + dr) - r * r)
+            Bz = nasa_axial(Br, mag_r, mag_h / 2, r, z)
+            dFL += Bz * np.pi * 2 * r * dr
             FL += dN * dFL
             r += dr
         z += dz
@@ -401,32 +398,30 @@ def flux_linkage_Derby_axial(Br, mag_h, mag_r, coil_h, coil_r1, coil_r2,
     dN = Nz_float / Nz * Nr_float / Nr
 
     FL = 0.0
-    dz = coil_h / (Nz)
-    dz2 = dz / 2
-    z = d - coil_h / 2 + dz2
+    dz = coil_h / Nz
+    z = d - coil_h / 2 + dz / 2
     for j in xrange(Nz):
-        r = 0
         dFL = 0.0
 
         dr = mag_r / parts
-        dr2 = dr / 2
+        r = dr / 2
         for i in xrange(parts):
-            Bz = Derby_axial(Br, mag_r, mag_h / 2, r + dr2, z)
-            dFL += Bz * np.pi * ((r + dr) * (r + dr) - r * r)
+            Bz = Derby_axial(Br, mag_r, mag_h / 2, r, z)
+            dFL += Bz * np.pi * 2 * r * dr
             r += dr
 
         dr = (coil_r1 - mag_r) / parts
-        dr2 = dr / 2
+        r = mag_r + dr / 2
         for i in xrange(parts):
-            Bz = Derby_axial(Br, mag_r, mag_h / 2, r + dr2, z)
-            dFL += Bz * np.pi * ((r + dr) * (r + dr) - r * r)
+            Bz = Derby_axial(Br, mag_r, mag_h / 2, r, z)
+            dFL += Bz * np.pi * 2 * r * dr
             r += dr
 
         dr = (coil_r2 - coil_r1) / Nr
-        dr2 = dr / 2
+        r = coil_r1 + dr / 2
         for i in xrange(Nr):
-            Bz = Derby_axial(Br, mag_r, mag_h / 2, r + dr2, z)
-            dFL += Bz * np.pi * ((r + dr) * (r + dr) - r * r)
+            Bz = Derby_axial(Br, mag_r, mag_h / 2, r, z)
+            dFL += Bz * np.pi * 2 * r * dr
             FL += dN * dFL
             r += dr
         z += dz
