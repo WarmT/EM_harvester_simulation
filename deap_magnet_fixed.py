@@ -87,7 +87,7 @@ POPULATION = 100
 
 population = toolbox.population(n=POPULATION)
 
-NGEN=10
+NGEN=20
 
 gen_max = np.ones(NGEN)
 
