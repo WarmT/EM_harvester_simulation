@@ -25,7 +25,7 @@ print "V = %.e, m_V = %.e, m_V/V = %.2f" % (V, m_V, m_V / V)
 m_Br = 1.3
 gap = 1.26e-3
 R_max_ratio = 2.0
-two_coils = True
+two_coils = False
 k_co = 0.6
 d_co = 100e-6
 
@@ -95,9 +95,10 @@ toolbox.register("evaluate", evalOneMax, m_r=m_r, m_h=m_h, R_max_ratio=R_max_rat
 toolbox.decorate("mate", checkBounds(ratio_min, ratio_max))
 toolbox.decorate("mutate", checkBounds(ratio_min, ratio_max))
 
+
 def main():
     random.seed()
-    NGEN = 50
+    NGEN = 30
     MU, LAMBDA = 50, 100
     pop = toolbox.population(n=MU)
     hof = tools.HallOfFame(1)
@@ -137,62 +138,46 @@ def main():
 
     gen = np.array(logbook.select("gen"))
 
-    fig, axes = plt.subplots(facecolor='white', nrows=4, ncols=1, figsize=(17, 9))
+    fig, axes = plt.subplots(facecolor='white', nrows=2, ncols=1, figsize=(17, 9))
 
     R_maxs = logbook.chapters["R"].select("max")
     R_avgs = logbook.chapters["R"].select("avg")
     R_mins = logbook.chapters["R"].select("min")
-    axes[0].plot(gen, R_maxs, '-b', label="max")
-    axes[0].plot(gen, R_avgs, '--b', label="avg")
-    axes[0].plot(gen, R_mins, '-b', label="min")
-    axes[0].set_title("R_ratio")
+    axes[0].plot(gen, R_maxs, '-r', label="R_ratio")
+    axes[0].plot(gen, R_avgs, '--r')
+    axes[0].plot(gen, R_mins, '-r')
 
     H_maxs = logbook.chapters["H"].select("max")
     H_avgs = logbook.chapters["H"].select("avg")
     H_mins = logbook.chapters["H"].select("min")
-    axes[1].plot(gen, H_maxs, '-b', label="max")
-    axes[1].plot(gen, H_avgs, '--b', label="avg")
-    axes[1].plot(gen, H_mins, '-b', label="min")
-    axes[1].set_title("H_ratio")
+    axes[0].plot(gen, H_maxs, '-g', label="H_ratio")
+    axes[0].plot(gen, H_avgs, '--g')
+    axes[0].plot(gen, H_mins, '-g')
 
     T_maxs = logbook.chapters["T"].select("max")
     T_avgs = logbook.chapters["T"].select("avg")
     T_mins = logbook.chapters["T"].select("min")
-    axes[2].plot(gen, T_maxs, '-b', label="max")
-    axes[2].plot(gen, T_avgs, '--b', label="avg")
-    axes[2].plot(gen, T_mins, '-b', label="min")
-    axes[2].set_title("T_ratio")
+    axes[0].plot(gen, T_maxs, '-b', label="T_ratio")
+    axes[0].plot(gen, T_avgs, '--b')
+    axes[0].plot(gen, T_mins, '-b')
+    axes[0].legend(loc=1)
 
     fit_maxs = np.array(logbook.chapters["fitness"].select("max")) * 1000
     fit_avgs = np.array(logbook.chapters["fitness"].select("avg")) * 1000
     fit_mins = np.array(logbook.chapters["fitness"].select("min")) * 1000
-    axes[3].plot(gen, fit_maxs, '-b', label="max")
-    axes[3].plot(gen, fit_avgs, '--b', label="avg")
-    axes[3].plot(gen, fit_mins, '-b', label="min")
-    axes[3].set_title(r"$P_\mathrm{max}\,\,(\mathrm{mW})$")
+    axes[1].plot(gen, fit_maxs, '-b', label=r"$P_\mathrm{max}\,\,(\mathrm{mW})$")
+    axes[1].plot(gen, fit_avgs, '--b')
+    axes[1].plot(gen, fit_mins, '-b')
+    axes[1].legend(loc=1)
 
-    fig.subplots_adjust(wspace=0.01, hspace=0.4, left=0.05, right=0.98, top=0.97, bottom=0.03)
+    fig.subplots_adjust(wspace=0.01, hspace=0.1, left=0.02, right=0.99, top=0.98, bottom=0.03)
     plt.show(block=False)
     raw_input("hit any key!")
     plt.savefig("optim_progress_es.pdf")
     plt.close()
 
-
-    fit = np.zeros(len(pop))
-    for i, p in enumerate(pop):
-        fit[i] = p.fitness.values[0]
-    print fit
-    print "min = %.8f, max = %.8f, std = %.8f" % (np.min(fit), np.max(fit), np.std(fit))
-
-    pop_array = np.array(pop)
-    R_array =  pop_array[0, :]
-    H_array =  pop_array[1, :]
-    T_array =  pop_array[2, :]
-
-
     hof_array = np.array(hof)
 
-    # fig, axes = plt.subplots(facecolor='white', figsize=(17, 9))
     R_ratio  = hof_array[0][0]
     H_ratio  = hof_array[0][1]
     T_ratio  = hof_array[0][2]
