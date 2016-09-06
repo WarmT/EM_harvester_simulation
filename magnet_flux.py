@@ -592,8 +592,6 @@ def calc_power_two_coils(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, N, d_co, t0, 
 
 def draw_flux_lines_coil(outfile, m_Br, m_r, m_h, coil_r1, coil_r2, coil_h, N, d_co, t0, P_max, two_coils):  # noqa
 
-    d_co = 100e-6
-
     steps = 200
     steps2 = int(steps / 2)
     ymax = (m_h / 2 - t0 + coil_h) * 1.2
@@ -606,11 +604,9 @@ def draw_flux_lines_coil(outfile, m_Br, m_r, m_h, coil_r1, coil_r2, coil_h, N, d
     Y, X = np.mgrid[-ymax:ymax:200j, -xmax:xmax:200j]
     B = np.zeros((steps, steps))
 
-    Br = 1.2
-
     for i in range(steps):
         for j in range(steps2):
-            Bz_axial = nasa_axial(Br, m_r, m_h / 2, X[i][steps2 + j], Y[i][steps2 + j])
+            Bz_axial = nasa_axial(m_Br, m_r, m_h / 2, X[i][steps2 + j], Y[i][steps2 + j])
             B[i][steps2 + j] = -Bz_axial
             B[i][steps2 - j] = -Bz_axial
 
@@ -675,8 +671,12 @@ def draw_flux_lines_coil(outfile, m_Br, m_r, m_h, coil_r1, coil_r2, coil_h, N, d
         ax.add_patch(patches.Rectangle((coil_r1, -m_h / 2 + t0 - coil_h), coil_r2 - coil_r1,
                                        coil_h, facecolor='yellow', alpha=0.2))
 
-    title = (r"$B_r = %.1f\,\mathrm{T},\,N = %d,\,d_\mathrm{co} = %d\,\mathrm{um},\,$" +
-             r"$P_\mathrm{max} = %.1f\,\mathrm{mW}$") % (m_Br, N, int(round(d_co * 1e6)), P_max)
+    if P_max < 10:
+        title = (r"$B_r = %.1f\,\mathrm{T},\,N = %d,\,d_\mathrm{co} = %d\,\mathrm{um},\,$" +
+                 r"$P_\mathrm{max} = %.2f\,\mathrm{mW}$") % (m_Br, N, int(round(d_co * 1e6)), P_max)
+    else:
+        title = (r"$B_r = %.1f\,\mathrm{T},\,N = %d,\,d_\mathrm{co} = %d\,\mathrm{um},\,$" +
+                 r"$P_\mathrm{max} = %.1f\,\mathrm{mW}$") % (m_Br, N, int(round(d_co * 1e6)), P_max)
 
     plt.title(title)
     plt.axis([-xmax, xmax, -ymax, ymax])
