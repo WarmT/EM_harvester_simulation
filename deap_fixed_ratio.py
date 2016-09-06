@@ -138,7 +138,7 @@ def main():
 
     gen = np.array(logbook.select("gen"))
 
-    fig, axes = plt.subplots(facecolor='white', nrows=2, ncols=1, figsize=(17, 9))
+    fig, axes = plt.subplots(facecolor='white', nrows=2, ncols=1, figsize=(12, 6))
 
     R_maxs = logbook.chapters["R"].select("max")
     R_avgs = logbook.chapters["R"].select("avg")
@@ -170,7 +170,7 @@ def main():
     axes[1].plot(gen, fit_mins, '-b')
     axes[1].legend(loc=1)
 
-    fig.subplots_adjust(wspace=0.01, hspace=0.1, left=0.02, right=0.99, top=0.98, bottom=0.03)
+    fig.subplots_adjust(wspace=0.01, hspace=0.1, left=0.03, right=0.99, top=0.98, bottom=0.04)
     plt.show(block=False)
     raw_input("hit any key!")
     plt.savefig("fixed_ratio_progress_es.pdf")
