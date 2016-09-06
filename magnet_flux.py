@@ -429,7 +429,7 @@ def flux_linkage_Derby_axial(Br, mag_h, mag_r, coil_h, coil_r1, coil_r2,
 
 
 def calc_flux_gradient(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, N, d_co, d):
-    parts = 12
+    parts = 30
 
     k_co = np.pi * d_co * d_co * N / (4 * coil_h * (coil_r2 - coil_r1))
 
@@ -447,7 +447,7 @@ def calc_flux_gradient(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, N, d_co, d):
 
 @jit
 def calc_power(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, N, d_co, t0, a, f):
-    parts = 12
+    parts = 30
 
     k_co = np.pi * d_co * d_co * N / (4 * coil_h * (coil_r2 - coil_r1))
 
@@ -483,7 +483,7 @@ def calc_power(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, N, d_co, t0, a, f):
 
 @jit
 def calc_power_all(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, N, d_co, t0, a, f):
-    parts = 12
+    parts = 30
 
     k_co = np.pi * d_co * d_co * N / (4 * coil_h * (coil_r2 - coil_r1))
 
@@ -520,7 +520,7 @@ def calc_power_all(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, N, d_co, t0, a, f):
 
 @jit
 def calc_power_all_two_coils(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, N, d_co, t0, a, f):
-    parts = 12
+    parts = 30
 
     k_co = np.pi * d_co * d_co * N / (4 * coil_h * (coil_r2 - coil_r1))
 
@@ -556,7 +556,7 @@ def calc_power_all_two_coils(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, N, d_co, 
 
 @jit
 def calc_power_two_coils(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, N, d_co, t0, a, f):
-    parts = 12
+    parts = 30
 
     k_co = np.pi * d_co * d_co * N / (4 * coil_h * (coil_r2 - coil_r1))
 
@@ -610,7 +610,7 @@ def draw_flux_lines_coil(outfile, m_Br, m_r, m_h, coil_r1, coil_r2, coil_h, N, d
             B[i][steps2 + j] = -Bz_axial
             B[i][steps2 - j] = -Bz_axial
 
-    fig = plt.figure(facecolor='white', figsize=(17, 15))
+    fig = plt.figure(facecolor='white', figsize=(10, 10))
     ax = plt.gca()
 
     CS = plt.contour(X * 1000, Y * 1000, B, 50, colors='k')
