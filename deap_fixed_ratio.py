@@ -29,7 +29,7 @@ d_co = 40e-6
 a = 10.0
 f = 50.0
 m_Br = 1.1
-two_coils = False
+two_coils = True
 
 creator.create("FitnessMax", base.Fitness, weights=(1.0,))
 creator.create("Individual", array.array, typecode="d", fitness=creator.FitnessMax, strategy=None)
@@ -173,7 +173,10 @@ def main():
     fig.subplots_adjust(wspace=0.01, hspace=0.1, left=0.03, right=0.99, top=0.98, bottom=0.04)
     plt.show(block=False)
     raw_input("hit any key!")
-    plt.savefig("fixed_ratio_progress_es.pdf")
+    if two_coils:
+        plt.savefig("fixed_ratio_progress_es2.pdf")
+    else:
+        plt.savefig("fixed_ratio_progress_es.pdf")
     plt.close()
 
     hof_array = np.array(hof)
@@ -190,7 +193,12 @@ def main():
     N = int(round(4.0 * coil_h * (coil_r2 - coil_r1) * k_co / (d_co * d_co * np.pi)))
     P_max = hof[0].fitness.values[0] * 1000
 
-    draw_flux_lines_coil("fixed_ratio_optimum_es.pdf", m_Br, m_r, m_h, coil_r1, coil_r2, coil_h, N, d_co, t0, P_max, two_coils)
+    if two_coils:
+        outfile = "fixed_ratio_optimum_es2.pdf"
+    else:
+        outfile = "fixed_ratio_optimum_es.pdf"
+
+    draw_flux_lines_coil(outfile, m_Br, m_r, m_h, coil_r1, coil_r2, coil_h, N, d_co, t0, P_max, two_coils)
 
     return pop, logbook, hof
 
