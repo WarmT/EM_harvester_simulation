@@ -21,7 +21,7 @@ smin = 0.2
 xmax = 6.3
 ymax = 3.0
 
-coil_r2 = 6e-3
+r_o = 6e-3
 h = 8.9e-3
 gap = 0.5e-3
 k_co = 0.6
@@ -29,7 +29,7 @@ d_co = 40e-6
 a = 10.0
 f = 50.0
 m_Br = 1.1
-two_coils = True
+two_coils = False
 
 creator.create("FitnessMax", base.Fitness, weights=(1.0,))
 creator.create("Individual", array.array, typecode="d", fitness=creator.FitnessMax, strategy=None)
@@ -58,27 +58,27 @@ def checkBounds(min, max):
     return decorator
 
 
-def evalOneMax(individual, coil_r2, h, gap, k_co, d_co, a, f, m_Br, two_coils, printing):
+def evalOneMax(individual, r_o, h, gap, k_co, d_co, a, f, m_Br, two_coils, printing):
     R_ratio  = individual[0]
     H_ratio  = individual[1]
     T_ratio  = individual[2]
 #    T_ratio  = 0.75
 
-    coil_r1 = R_ratio * coil_r2
-    m_r     = coil_r1 - gap
-    coil_h = H_ratio * h
-    t0     = T_ratio * coil_h
-    m_h = h - coil_h + t0
+    r_i = R_ratio * r_o
+    r_mag     = r_i - gap
+    h_coil = H_ratio * h
+    t0     = T_ratio * h_coil
+    h_mag = h - h_coil + t0
 
-    N = int(round(4.0 * coil_h * (coil_r2 - coil_r1) * k_co / (d_co * d_co * np.pi)))
+    N = int(round(4.0 * h_coil * (r_o - r_i) * k_co / (d_co * d_co * np.pi)))
 
     if two_coils:
-        P = calc_power_two_coils(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, N, d_co, t0, a, f)
+        P = calc_power_two_coils(m_Br, h_mag, r_mag, h_coil, r_i, r_o, N, d_co, t0, a, f)
     else:
-        P = calc_power(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, N, d_co, t0, a, f)
+        P = calc_power(m_Br, h_mag, r_mag, h_coil, r_i, r_o, N, d_co, t0, a, f)
     if printing:
 
-        print "R_ratio = %.2f, H_ratio = %.2f, T_ratio = %.2f, coil_r1 = %.3f, coil_r2 = %.3f, coil_h = %.3f, m_h = %.3f, h = %.3f, N = %d, P = %.3f mW" % (R_ratio, H_ratio, T_ratio, coil_r1*1000, coil_r2*1000, coil_h*1000, m_h*1000, h*1000, N, P*1000)
+        print "R_ratio = %.2f, H_ratio = %.2f, T_ratio = %.2f, r_i = %.3f, r_o = %.3f, h_coil = %.3f, h_mag = %.3f, h = %.3f, N = %d, P = %.3f mW" % (R_ratio, H_ratio, T_ratio, r_i*1000, r_o*1000, h_coil*1000, h_mag*1000, h*1000, N, P*1000)
     return P,
 
 toolbox = base.Toolbox()
@@ -89,7 +89,7 @@ toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 toolbox.register("mate", tools.cxESBlend, alpha=0.1)
 toolbox.register("mutate", tools.mutESLogNormal, c=1.0, indpb=0.03)
 toolbox.register("select", tools.selTournament, tournsize=3)
-toolbox.register("evaluate", evalOneMax, coil_r2=coil_r2, h=h, gap=gap, k_co=k_co, d_co=d_co,
+toolbox.register("evaluate", evalOneMax, r_o=r_o, h=h, gap=gap, k_co=k_co, d_co=d_co,
                  a=10.0, f=50.0, m_Br=m_Br, two_coils=two_coils, printing=False)
 
 toolbox.decorate("mate", checkBounds(ratio_min, ratio_max))
@@ -185,12 +185,12 @@ def main():
     H_ratio  = hof_array[0][1]
     T_ratio  = hof_array[0][2]
 
-    coil_r1 = R_ratio * coil_r2
-    m_r     = coil_r1 - gap
-    coil_h = H_ratio * h
-    t0     = T_ratio * coil_h
-    m_h = h - coil_h + t0
-    N = int(round(4.0 * coil_h * (coil_r2 - coil_r1) * k_co / (d_co * d_co * np.pi)))
+    r_i = R_ratio * r_o
+    r_mag     = r_i - gap
+    h_coil = H_ratio * h
+    t0     = T_ratio * h_coil
+    h_mag = h - h_coil + t0
+    N = int(round(4.0 * h_coil * (r_o - r_i) * k_co / (d_co * d_co * np.pi)))
     P_max = hof[0].fitness.values[0] * 1000
 
     if two_coils:
@@ -198,7 +198,7 @@ def main():
     else:
         outfile = "fixed_ratio_optimum_es.pdf"
 
-    draw_flux_lines_coil(outfile, m_Br, m_r, m_h, coil_r1, coil_r2, coil_h, N, d_co, t0, P_max, two_coils)
+    draw_flux_lines_coil(outfile, m_Br, r_mag, h_mag, r_i, r_o, h_coil, N, d_co, t0, P_max, two_coils, False, a, f)
 
     return pop, logbook, hof
 
