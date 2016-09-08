@@ -465,7 +465,7 @@ def flux_linkage_Derby_axial(Br, h_mag, r_mag, h_coil, r_i, r_o, k_co, d_co, d, 
     return FL
 
 
-def calc_flux_gradient(m_Br, h_mag, m_r, h_coil, r_i, r_o, N, d_co, d):
+def calc_flux_gradient(m_Br, h_mag, r_mag, h_coil, r_i, r_o, N, d_co, d):
     parts = 30
 
     k_co = np.pi * d_co * d_co * N / (4 * h_coil * (r_o - r_i))
@@ -475,15 +475,15 @@ def calc_flux_gradient(m_Br, h_mag, m_r, h_coil, r_i, r_o, N, d_co, d):
 
     step = h_coil / Nz
 
-    y1 = flux_linkage_Derby_axial(m_Br, h_mag, m_r, h_coil, r_i, r_o, k_co, d_co, d - step, parts)  # noqa
-    y2 = flux_linkage_Derby_axial(m_Br, h_mag, m_r, h_coil, r_i, r_o, k_co, d_co, d + step, parts)  # noqa
+    y1 = flux_linkage_Derby_axial(m_Br, h_mag, r_mag, h_coil, r_i, r_o, k_co, d_co, d - step, parts)  # noqa
+    y2 = flux_linkage_Derby_axial(m_Br, h_mag, r_mag, h_coil, r_i, r_o, k_co, d_co, d + step, parts)  # noqa
     k = (y2 - y1) / (2 * step)
 
     return k
 
 
 @jit
-def calc_power(m_Br, h_mag, m_r, h_coil, r_i, r_o, N, d_co, t0, a, f):
+def calc_power(m_Br, h_mag, r_mag, h_coil, r_i, r_o, N, d_co, t0, a, f):
     parts = 30
 
     k_co = np.pi * d_co * d_co * N / (4 * h_coil * (r_o - r_i))
@@ -492,9 +492,9 @@ def calc_power(m_Br, h_mag, m_r, h_coil, r_i, r_o, N, d_co, t0, a, f):
     step = h_coil / Nz
 
     d = -(h_mag + h_coil) / 2 + t0 - step
-    y1 = flux_linkage_Derby_axial(m_Br, h_mag, m_r, h_coil, r_i, r_o, k_co, d_co, d, parts)
+    y1 = flux_linkage_Derby_axial(m_Br, h_mag, r_mag, h_coil, r_i, r_o, k_co, d_co, d, parts)
     d = -(h_mag + h_coil) / 2 + t0 + step
-    y2 = flux_linkage_Derby_axial(m_Br, h_mag, m_r, h_coil, r_i, r_o, k_co, d_co, d, parts)
+    y2 = flux_linkage_Derby_axial(m_Br, h_mag, r_mag, h_coil, r_i, r_o, k_co, d_co, d, parts)
     k = (y2 - y1) / (2 * step)
 
     resistivity = 1.709e-8 / (d_co * d_co * np.pi / 4)
@@ -504,7 +504,7 @@ def calc_power(m_Br, h_mag, m_r, h_coil, r_i, r_o, N, d_co, t0, a, f):
 
     de = k * k / (R_coil + R_load)
     density = 7600.0
-    m = h_mag * np.pi * m_r * m_r * density
+    m = h_mag * np.pi * r_mag * r_mag * density
 #    print "de = %.2f, m = %.2f g" % (de, m*1000)
 
     omega = 2 * np.pi * f
@@ -519,7 +519,7 @@ def calc_power(m_Br, h_mag, m_r, h_coil, r_i, r_o, N, d_co, t0, a, f):
 
 
 @jit
-def calc_power_all(m_Br, h_mag, m_r, h_coil, r_i, r_o, N, d_co, t0, a, f):
+def calc_power_all(m_Br, h_mag, r_mag, h_coil, r_i, r_o, N, d_co, t0, a, f):
     parts = 30
 
     k_co = np.pi * d_co * d_co * N / (4 * h_coil * (r_o - r_i))
@@ -528,9 +528,9 @@ def calc_power_all(m_Br, h_mag, m_r, h_coil, r_i, r_o, N, d_co, t0, a, f):
     step = h_coil / Nz
 
     d = -(h_mag + h_coil) / 2 + t0 - step
-    y1 = flux_linkage_Derby_axial(m_Br, h_mag, m_r, h_coil, r_i, r_o, k_co, d_co, d, parts)
+    y1 = flux_linkage_Derby_axial(m_Br, h_mag, r_mag, h_coil, r_i, r_o, k_co, d_co, d, parts)
     d = -(h_mag + h_coil) / 2 + t0 + step
-    y2 = flux_linkage_Derby_axial(m_Br, h_mag, m_r, h_coil, r_i, r_o, k_co, d_co, d, parts)
+    y2 = flux_linkage_Derby_axial(m_Br, h_mag, r_mag, h_coil, r_i, r_o, k_co, d_co, d, parts)
     k = (y2 - y1) / (2 * step)
 
 #    print "Nz = %d, Nr = %d, N = %d" % (round(Nz), round(Nr), round(N))
@@ -541,7 +541,7 @@ def calc_power_all(m_Br, h_mag, m_r, h_coil, r_i, r_o, N, d_co, t0, a, f):
 
     de = k * k / (R_coil + R_load)
     density = 7600.0
-    m = h_mag * np.pi * m_r * m_r * density
+    m = h_mag * np.pi * r_mag * r_mag * density
 #    print "de = %.2f, m = %.2f g" % (de, m*1000)
 
     omega = 2 * np.pi * f
@@ -556,7 +556,7 @@ def calc_power_all(m_Br, h_mag, m_r, h_coil, r_i, r_o, N, d_co, t0, a, f):
 
 
 @jit
-def calc_power_all_two_coils(m_Br, h_mag, m_r, h_coil, r_i, r_o, N, d_co, t0, a, f):
+def calc_power_all_two_coils(m_Br, h_mag, r_mag, h_coil, r_i, r_o, N, d_co, t0, a, f):
     parts = 30
 
     k_co = np.pi * d_co * d_co * N / (4 * h_coil * (r_o - r_i))
@@ -565,9 +565,9 @@ def calc_power_all_two_coils(m_Br, h_mag, m_r, h_coil, r_i, r_o, N, d_co, t0, a,
     step = h_coil / Nz
 
     d = -(h_mag + h_coil) / 2 + t0 - step
-    y1 = flux_linkage_Derby_axial(m_Br, h_mag, m_r, h_coil, r_i, r_o, k_co, d_co, d, parts)
+    y1 = flux_linkage_Derby_axial(m_Br, h_mag, r_mag, h_coil, r_i, r_o, k_co, d_co, d, parts)
     d = -(h_mag + h_coil) / 2 + t0 + step
-    y2 = flux_linkage_Derby_axial(m_Br, h_mag, m_r, h_coil, r_i, r_o, k_co, d_co, d, parts)
+    y2 = flux_linkage_Derby_axial(m_Br, h_mag, r_mag, h_coil, r_i, r_o, k_co, d_co, d, parts)
     k = (y2 - y1) / (step)  # k is now doubled !!!!!!!!
 
     resistivity = 1.709e-8 / (d_co * d_co * np.pi / 4)
@@ -577,7 +577,7 @@ def calc_power_all_two_coils(m_Br, h_mag, m_r, h_coil, r_i, r_o, N, d_co, t0, a,
 
     de = k * k / (R_coil + R_load)
     density = 7600.0
-    m = h_mag * np.pi * m_r * m_r * density
+    m = h_mag * np.pi * r_mag * r_mag * density
 #    print "de = %.2f, m = %.2f g" % (de, m*1000)
 
     omega = 2 * np.pi * f
@@ -592,7 +592,7 @@ def calc_power_all_two_coils(m_Br, h_mag, m_r, h_coil, r_i, r_o, N, d_co, t0, a,
 
 
 @jit
-def calc_power_two_coils(m_Br, h_mag, m_r, h_coil, r_i, r_o, N, d_co, t0, a, f):
+def calc_power_two_coils(m_Br, h_mag, r_mag, h_coil, r_i, r_o, N, d_co, t0, a, f):
     parts = 30
 
     k_co = np.pi * d_co * d_co * N / (4 * h_coil * (r_o - r_i))
@@ -601,9 +601,9 @@ def calc_power_two_coils(m_Br, h_mag, m_r, h_coil, r_i, r_o, N, d_co, t0, a, f):
     step = h_coil / Nz
 
     d = -(h_mag + h_coil) / 2 + t0 - step
-    y1 = flux_linkage_Derby_axial(m_Br, h_mag, m_r, h_coil, r_i, r_o, k_co, d_co, d, parts)
+    y1 = flux_linkage_Derby_axial(m_Br, h_mag, r_mag, h_coil, r_i, r_o, k_co, d_co, d, parts)
     d = -(h_mag + h_coil) / 2 + t0 + step
-    y2 = flux_linkage_Derby_axial(m_Br, h_mag, m_r, h_coil, r_i, r_o, k_co, d_co, d, parts)
+    y2 = flux_linkage_Derby_axial(m_Br, h_mag, r_mag, h_coil, r_i, r_o, k_co, d_co, d, parts)
     k = (y2 - y1) / (step)  # k is now doubled !!!!!!!!
 
     resistivity = 1.709e-8 / (d_co * d_co * np.pi / 4)
@@ -613,7 +613,7 @@ def calc_power_two_coils(m_Br, h_mag, m_r, h_coil, r_i, r_o, N, d_co, t0, a, f):
 
     de = k * k / (R_coil + R_load)
     density = 7600.0
-    m = h_mag * np.pi * m_r * m_r * density
+    m = h_mag * np.pi * r_mag * r_mag * density
 #    print "de = %.2f, m = %.2f g" % (de, m*1000)
 
     omega = 2 * np.pi * f
@@ -627,7 +627,12 @@ def calc_power_two_coils(m_Br, h_mag, m_r, h_coil, r_i, r_o, N, d_co, t0, a, f):
     return P
 
 
-def draw_flux_lines_coil(outfile, m_Br, m_r, h_mag, r_i, r_o, h_coil, N, d_co, t0, P_max, two_coils):  # noqa
+def draw_flux_lines_coil(outfile, m_Br, r_mag, h_mag, r_i, r_o, h_coil, N, d_co, t0, P_max, two_coils, arrows, a, f):  # noqa
+
+    if two_coils:
+        Z, R_coil, R_load, k, V_load, P = calc_power_all_two_coils(m_Br, h_mag, r_mag, h_coil, r_i, r_o, N, d_co, t0, a, f)  # noqa
+    else:
+        Z, R_coil, R_load, k, V_load, P = calc_power_all(m_Br, h_mag, r_mag, h_coil, r_i, r_o, N, d_co, t0, a, f)
 
     steps = 200
     steps2 = int(steps / 2)
@@ -643,7 +648,7 @@ def draw_flux_lines_coil(outfile, m_Br, m_r, h_mag, r_i, r_o, h_coil, N, d_co, t
 
     for i in range(steps):
         for j in range(steps2):
-            Bz_axial = nasa_axial(m_Br, m_r, h_mag / 2, X[i][steps2 + j], Y[i][steps2 + j])
+            Bz_axial = nasa_axial(m_Br, r_mag, h_mag / 2, X[i][steps2 + j], Y[i][steps2 + j])
             B[i][steps2 + j] = -Bz_axial
             B[i][steps2 - j] = -Bz_axial
 
@@ -658,7 +663,7 @@ def draw_flux_lines_coil(outfile, m_Br, m_r, h_mag, r_i, r_o, h_coil, N, d_co, t
     h_coil *= 1000
     r_i *= 1000
     r_o *= 1000
-    m_r *= 1000
+    r_mag *= 1000
     h_mag *= 1000
     offset *= 1000
     t0 *= 1000
@@ -668,39 +673,41 @@ def draw_flux_lines_coil(outfile, m_Br, m_r, h_mag, r_i, r_o, h_coil, N, d_co, t
     ax = plt.gca()
     ax.add_patch(patches.Rectangle((-r_o, h_mag / 2 - t0), r_o - r_i, h_coil,
                                    facecolor='yellow', alpha=0.2))
-    ax.text(-(r_o + r_i) / 2, h_mag / 2 - t0 + 0.8 * h_coil,
-            "Coil", ha='center', fontsize=24)
+#    ax.text(-(r_o + r_i) / 2, h_mag / 2 - t0 + 0.8 * h_coil,
+#            "Coil", ha='center', fontsize=24)
     ax.add_patch(patches.Rectangle((r_i, h_mag / 2 - t0), r_o - r_i, h_coil,
                                    facecolor='yellow', alpha=0.2))
 
-    ax.annotate("", [-r_o, h_mag / 2 - t0 - 4 * offset], [0, h_mag / 2 - t0 - 4 * offset],
-                arrowprops=dict(lw=2, color='blue', arrowstyle='<->', mutation_scale=20))
-    ax.text(-r_o / 2, h_mag / 2 - t0 - 3 * offset, "%.2f mm" % (r_o),
-            ha='center', color='blue', fontsize=16)
+    if arrows:
 
-    ax.annotate("", [-r_i, h_mag / 2 - t0 + 5 * offset], [0, h_mag / 2 - t0 + 5 * offset],
-                arrowprops=dict(lw=2, color='blue', arrowstyle='<->'))
-    ax.text(-r_i / 2, h_mag / 2 - t0 + 6 * offset, "%.2f mm" % (r_i),
-            ha='center', color='blue', fontsize=16)
+        ax.annotate("", [-r_o, h_mag / 2 - t0 - 4 * offset], [0, h_mag / 2 - t0 - 4 * offset],
+                    arrowprops=dict(lw=2, color='blue', arrowstyle='<->', mutation_scale=20))
+        ax.text(-r_o / 2, h_mag / 2 - t0 - 3 * offset, "%.2f mm" % (r_o),
+                ha='center', color='blue', fontsize=16)
 
-    ax.annotate("", [-m_r, -h_mag / 2], [0, -h_mag / 2],
-                arrowprops=dict(lw=2, color='blue', arrowstyle='<->'))
-    ax.text(-m_r / 2, -h_mag / 2 + offset, "%.2f mm" % (m_r),
-            ha='center', color='blue', fontsize=16)
+        ax.annotate("", [-r_i, h_mag / 2 - t0 + 5 * offset], [0, h_mag / 2 - t0 + 5 * offset],
+                    arrowprops=dict(lw=2, color='blue', arrowstyle='<->'))
+        ax.text(-r_i / 2, h_mag / 2 - t0 + 6 * offset, "%.2f mm" % (r_i),
+                ha='center', color='blue', fontsize=16)
 
-    ax.annotate("", [0, -h_mag / 2], [0, h_mag / 2],
-                arrowprops=dict(lw=2, color='blue', arrowstyle='<->'))
-    ax.text(offset, 0, "%.2f mm" % (h_mag), ha='left', color='blue', fontsize=16)
+        ax.annotate("", [-r_mag, -h_mag / 2], [0, -h_mag / 2],
+                    arrowprops=dict(lw=2, color='blue', arrowstyle='<->'))
+        ax.text(-r_mag / 2, -h_mag / 2 + offset, "%.2f mm" % (r_mag),
+                ha='center', color='blue', fontsize=16)
 
-    ax.annotate("", [-r_o + offset, h_mag / 2 - t0], [-r_o + offset, h_mag / 2 - t0 + h_coil],
-                arrowprops=dict(lw=2, color='blue', arrowstyle='<->'))
-    ax.text(-r_o + 2 * offset, h_mag / 2 - t0 + h_coil / 2, "%.2f mm" % (h_coil),
-            ha='left', color='blue', fontsize=16)
+        ax.annotate("", [0, -h_mag / 2], [0, h_mag / 2],
+                    arrowprops=dict(lw=2, color='blue', arrowstyle='<->'))
+        ax.text(offset, 0, "%.2f mm" % (h_mag), ha='left', color='blue', fontsize=16)
 
-    ax.annotate("", [-r_i - offset, h_mag / 2 - t0], [-r_i - offset, h_mag / 2],
-                arrowprops=dict(lw=2, color='blue', arrowstyle='<->'))
-    ax.text(-r_i - 2 * offset, h_mag / 2 - t0 / 2, "%.2f mm" % (t0),
-            ha='right', color='blue', fontsize=16)
+        ax.annotate("", [-r_o + offset, h_mag / 2 - t0], [-r_o + offset, h_mag / 2 - t0 + h_coil],
+                    arrowprops=dict(lw=2, color='blue', arrowstyle='<->'))
+        ax.text(-r_o + 2 * offset, h_mag / 2 - t0 + h_coil / 2, "%.2f mm" % (h_coil),
+                ha='left', color='blue', fontsize=16)
+
+        ax.annotate("", [-r_i - offset, h_mag / 2 - t0], [-r_i - offset, h_mag / 2],
+                    arrowprops=dict(lw=2, color='blue', arrowstyle='<->'))
+        ax.text(-r_i - 2 * offset, h_mag / 2 - t0 / 2, "%.2f mm" % (t0),
+                ha='right', color='blue', fontsize=16)
 
     if two_coils:
         ax.add_patch(patches.Rectangle((-r_o, -h_mag / 2 + t0 - h_coil), r_o - r_i,
@@ -709,8 +716,11 @@ def draw_flux_lines_coil(outfile, m_Br, m_r, h_mag, r_i, r_o, h_coil, N, d_co, t
                                        h_coil, facecolor='yellow', alpha=0.2))
 
     if P_max < 10:
-        title = (r"$B_r = %.1f\,\mathrm{T},\,N = %d,\,d_\mathrm{co} = %d\,\mathrm{um},\,$" +
-                 r"$P_\mathrm{max} = %.2f\,\mathrm{mW}$") % (m_Br, N, int(round(d_co * 1e6)), P_max)
+        title = (r"$N = %d,\,d_\mathrm{co} = %d\,\mathrm{\mu m},\,$" +
+                 r"$r_\mathrm{i} = %.2f\,\mathrm{mm},\,h_\mathrm{coil} = %.2f\,\mathrm{mm},\,$" +
+                 r"$t_\mathrm{0} = %.2f\,\mathrm{mm},\,P_\mathrm{max} = %.2f,\,\mathrm{mW},\,$" +
+                 r"$V_\mathrm{load} = %.2f \,\mathrm{V}$") % (N, int(round(d_co * 1e6)),
+                                                              r_i, h_coil, t0, P_max, V_load)
     else:
         title = (r"$B_r = %.1f\,\mathrm{T},\,N = %d,\,d_\mathrm{co} = %d\,\mathrm{um},\,$" +
                  r"$P_\mathrm{max} = %.1f\,\mathrm{mW}$") % (m_Br, N, int(round(d_co * 1e6)), P_max)
