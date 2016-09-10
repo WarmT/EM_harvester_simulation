@@ -13,7 +13,7 @@ from magnet_flux import *
 import time
 
 
-def plot_contours(outfile, X, Y, Z, Rc, Rl, k, V, P, print_P, d_co, N, norm):
+def plot_contours(outfile, X, Y, Z, Rc, Rl, k, V, P, print_P, d_co, N, norm, h, t0_per_h_coil, two_coils):
     P_max_y, P_max_x = np.unravel_index(np.argmax(P), P.shape)
     P_max = P[P_max_y][P_max_x]
     P_xx  = X[P_max_y][P_max_x]
@@ -29,9 +29,23 @@ def plot_contours(outfile, X, Y, Z, Rc, Rl, k, V, P, print_P, d_co, N, norm):
     V_xx  = X[V_max_y][V_max_x]
     V_yy  = Y[V_max_y][V_max_x]
 
-    print "d_co = %d um, c_r = %.1f, c_h = %.1f, P_max = %.2f mW, V(P_max) = %.2f V, Rc = %d, Rl = %d, Z = %.2f, N = %d" % \
-        (int(d_co * 1e6), P_xx, P_yy, P_max, V[P_max_y][P_max_x], int(round(Rc[P_max_y][P_max_x])),
-         int(round(Rl[P_max_y][P_max_x])), Z[P_max_y][P_max_x], int(round(N[P_max_y][P_max_x])))
+    h = h * 1000  # convert to mm
+    V_load = V[P_max_y][P_max_x]
+    r_i = P_xx
+    h_coil = P_yy
+    t0 = t0_per_h_coil * h_coil
+    if two_coils:
+        h_mag = h - 2 * h_coil + 2 * t0
+    else:
+        h_mag = h - h_coil + t0
+
+    h_mag_per_h = h_mag / h
+
+    print "P_load = %.2f mW, V_load = %.2f V, r_i = %.2f mm, h_coil = %.2f mm, h_mag/h = %.2f, t0/h_coil = %.2f" % (P_max, V_load, r_i, h_coil, h_mag_per_h, t0_per_h_coil)
+
+#    print "d_co = %d um, c_r = %.1f, c_h = %.1f, P_max = %.2f mW, V(P_max) = %.2f V, Rc = %d, Rl = %d, Z = %.2f, N = %d" % \
+#        (int(d_co * 1e6), P_xx, P_yy, P_max, V[P_max_y][P_max_x], int(round(Rc[P_max_y][P_max_x])),
+#         int(round(Rl[P_max_y][P_max_x])), Z[P_max_y][P_max_x], int(round(N[P_max_y][P_max_x])))
 
     if norm:
         P /= P_max
@@ -124,7 +138,7 @@ def plot_contours(outfile, X, Y, Z, Rc, Rl, k, V, P, print_P, d_co, N, norm):
 
 def draw_all_contours(outfile, m_Br, h, r_o, gap, t0_per_h_coil, d_co, k_co, a, f, two_coils, norm):
 
-    step = 0.2 / 1000
+    step = 0.1 / 1000
     min_r = 1.0 / 1000
     min_h = d_co
     x = np.arange(min_r, r_o, step)
@@ -158,7 +172,7 @@ def draw_all_contours(outfile, m_Br, h, r_o, gap, t0_per_h_coil, d_co, k_co, a, 
 #    end = time.time()
 #    print "Elapsed time : %.2f seconds to calculate %d points (%.1f/s)" % (end-start, x.size*y.size, x.size*y.size/(end-start))  
 
-    plot_contours(outfile, X, Y, Z, Rc, Rl, k, V, P, False, d_co, N_arr, norm)
+    plot_contours(outfile, X, Y, Z, Rc, Rl, k, V, P, False, d_co, N_arr, norm, h, t0_per_h_coil, two_coils)
 
 
 def main():
