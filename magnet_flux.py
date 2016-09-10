@@ -734,3 +734,60 @@ def draw_flux_lines_coil(outfile, m_Br, r_mag, h_mag, r_i, r_o, h_coil, N, d_co,
     plt.show(block=False)
     plt.savefig(outfile)
     raw_input("tadaa!")
+
+
+def harvester_sensitivity(m_Br, h_mag, r_mag, h_coil, r_i, r_o, N, d_co, t0, a, f, two_coils, tolerance):
+
+    if two_coils:
+        print "\nTwo coils:"
+        P_ref = calc_power_two_coils(m_Br, h_mag, r_mag, h_coil, r_i, r_o, N, d_co, t0, a, f)
+        print "P_ref = %.2f mW" % (P_ref * 1000)
+        P_h_mag_p  = calc_power_two_coils(m_Br, h_mag + tolerance, r_mag, h_coil, r_i, r_o, N, d_co, t0, a, f)
+        P_h_mag_n  = calc_power_two_coils(m_Br, h_mag - tolerance, r_mag, h_coil, r_i, r_o, N, d_co, t0, a, f)
+        P_r_mag_p  = calc_power_two_coils(m_Br, h_mag, r_mag + tolerance, h_coil, r_i, r_o, N, d_co, t0, a, f)
+        P_r_mag_n  = calc_power_two_coils(m_Br, h_mag, r_mag - tolerance, h_coil, r_i, r_o, N, d_co, t0, a, f)
+        P_h_coil_p = calc_power_two_coils(m_Br, h_mag, r_mag, h_coil + tolerance, r_i, r_o, N, d_co, t0, a, f)
+        P_h_coil_n = calc_power_two_coils(m_Br, h_mag, r_mag, h_coil - tolerance, r_i, r_o, N, d_co, t0, a, f)
+        P_r_i_p    = calc_power_two_coils(m_Br, h_mag, r_mag, h_coil, r_i + tolerance, r_o, N, d_co, t0, a, f)
+        P_r_i_n    = calc_power_two_coils(m_Br, h_mag, r_mag, h_coil, r_i - tolerance, r_o, N, d_co, t0, a, f)
+        P_r_o_p    = calc_power_two_coils(m_Br, h_mag, r_mag, h_coil, r_i, r_o + tolerance, N, d_co, t0, a, f)
+        P_r_o_n    = calc_power_two_coils(m_Br, h_mag, r_mag, h_coil, r_i, r_o - tolerance, N, d_co, t0, a, f)
+        P_t0_p     = calc_power_two_coils(m_Br, h_mag, r_mag, h_coil, r_i, r_o, N, d_co, t0 + tolerance, a, f)
+        P_t0_n     = calc_power_two_coils(m_Br, h_mag, r_mag, h_coil, r_i, r_o, N, d_co, t0 - tolerance, a, f)
+    else:
+        print "\nOne coil:"
+        P_ref = calc_power(m_Br, h_mag, r_mag, h_coil, r_i, r_o, N, d_co, t0, a, f)
+        print "P_ref = %.2f mW" % (P_ref * 1000)
+        P_h_mag_p  = calc_power(m_Br, h_mag + tolerance, r_mag, h_coil, r_i, r_o, N, d_co, t0, a, f)
+        P_h_mag_n  = calc_power(m_Br, h_mag - tolerance, r_mag, h_coil, r_i, r_o, N, d_co, t0, a, f)
+        P_r_mag_p  = calc_power(m_Br, h_mag, r_mag + tolerance, h_coil, r_i, r_o, N, d_co, t0, a, f)
+        P_r_mag_n  = calc_power(m_Br, h_mag, r_mag - tolerance, h_coil, r_i, r_o, N, d_co, t0, a, f)
+        P_h_coil_p = calc_power(m_Br, h_mag, r_mag, h_coil + tolerance, r_i, r_o, N, d_co, t0, a, f)
+        P_h_coil_n = calc_power(m_Br, h_mag, r_mag, h_coil - tolerance, r_i, r_o, N, d_co, t0, a, f)
+        P_r_i_p    = calc_power(m_Br, h_mag, r_mag, h_coil, r_i + tolerance, r_o, N, d_co, t0, a, f)
+        P_r_i_n    = calc_power(m_Br, h_mag, r_mag, h_coil, r_i - tolerance, r_o, N, d_co, t0, a, f)
+        P_r_o_p    = calc_power(m_Br, h_mag, r_mag, h_coil, r_i, r_o + tolerance, N, d_co, t0, a, f)
+        P_r_o_n    = calc_power(m_Br, h_mag, r_mag, h_coil, r_i, r_o - tolerance, N, d_co, t0, a, f)
+        P_t0_p     = calc_power(m_Br, h_mag, r_mag, h_coil, r_i, r_o, N, d_co, t0 + tolerance, a, f)
+        P_t0_n     = calc_power(m_Br, h_mag, r_mag, h_coil, r_i, r_o, N, d_co, t0 - tolerance, a, f)
+
+    print "\nLaTeX table:\n"
+
+    print "\\begin{table}[ht]"
+    print "\\caption{Output power $P_\mathrm{max}$ sensitivity to dimensional variations}"
+    print "\\centering"
+    print "\\begin{tabular}{ c S S }"
+    print "\\hline\\hline"
+    print " & {$+\\SI{%.2f}{\\mm}$} & {$-\\SI{%.2f}{\\mm}$} \\\\" % (tolerance * 1000, tolerance * 1000)
+    print "\\hline"
+    print " & \\si{\\mW} & \\si{\\mW} \\\\"
+    print "\\hline"
+    print "$h_\\mathrm{mag}$  & % .2f & % .2f \\\\" % ((P_h_mag_p  - P_ref) * 1000, (P_h_mag_n  - P_ref) * 1000)
+    print "$r_\\mathrm{mag}$  & % .2f & % .2f \\\\" % ((P_r_mag_p  - P_ref) * 1000, (P_r_mag_n  - P_ref) * 1000)
+    print "$h_\\mathrm{coil}$ & % .2f & % .2f \\\\" % ((P_h_coil_p - P_ref) * 1000, (P_h_coil_n - P_ref) * 1000)
+    print "$r_\\mathrm{i}$    & % .2f & % .2f \\\\" % ((P_r_i_p    - P_ref) * 1000, (P_r_i_n    - P_ref) * 1000)
+    print "$r_\\mathrm{o}$    & % .2f & % .2f \\\\" % ((P_r_o_p    - P_ref) * 1000, (P_r_o_n    - P_ref) * 1000)
+    print "$t_\\mathrm{0}$    & % .2f & % .2f \\\\" % ((P_t0_p     - P_ref) * 1000, (P_t0_n     - P_ref) * 1000)
+    print "\\end{tabular}"
+    print "\\label{table:dim_sensitivity}"
+    print "\\end{table}\n"
