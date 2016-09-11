@@ -13,7 +13,7 @@ from magnet_flux import *
 import time
 
 
-def plot_contours(outfile, X, Y, Z, Rc, Rl, k, V, P, print_P, d_co, N, norm, h, t0_per_h_coil, two_coils):
+def plot_contours(outfile, X, Y, Z, Rc, Rl, k, V, P, print_P, d_co, N, norm, h, t0_per_h_coil, two_coils, ask):
     P_max_y, P_max_x = np.unravel_index(np.argmax(P), P.shape)
     P_max = P[P_max_y][P_max_x]
     P_xx  = X[P_max_y][P_max_x]
@@ -36,12 +36,14 @@ def plot_contours(outfile, X, Y, Z, Rc, Rl, k, V, P, print_P, d_co, N, norm, h, 
     t0 = t0_per_h_coil * h_coil
     if two_coils:
         h_mag = h - 2 * h_coil + 2 * t0
+        coils = "Two coils:"
     else:
         h_mag = h - h_coil + t0
+        coils = "One coil: "
 
     h_mag_per_h = h_mag / h
 
-    print "P_load = %.2f mW, V_load = %.2f V, r_i = %.2f mm, h_coil = %.2f mm, h_mag/h = %.2f, t0/h_coil = %.2f" % (P_max, V_load, r_i, h_coil, h_mag_per_h, t0_per_h_coil)
+    print "%s P_load = %.2f mW, V_load = %.2f V, r_i = %.2f mm, h_coil = %.2f mm, h_mag/h = %.3f, t0/h_coil = %.3f" % (coils, P_max, V_load, r_i, h_coil, h_mag_per_h, t0_per_h_coil)
 
 #    print "d_co = %d um, c_r = %.1f, c_h = %.1f, P_max = %.2f mW, V(P_max) = %.2f V, Rc = %d, Rl = %d, Z = %.2f, N = %d" % \
 #        (int(d_co * 1e6), P_xx, P_yy, P_max, V[P_max_y][P_max_x], int(round(Rc[P_max_y][P_max_x])),
@@ -132,13 +134,14 @@ def plot_contours(outfile, X, Y, Z, Rc, Rl, k, V, P, print_P, d_co, N, norm, h, 
 #    fig.set_tight_layout(True)
     plt.show(block=False)
     plt.savefig(outfile)
-    raw_input("tadaa!")
+    if ask:
+        raw_input("Hit any key!")
     plt.close()
 
 
-def draw_all_contours(outfile, m_Br, h, r_o, gap, t0_per_h_coil, d_co, k_co, a, f, two_coils, norm):
+def draw_all_contours(outfile, m_Br, h, r_o, gap, t0_per_h_coil, d_co, k_co, a, f, two_coils, norm, ask):
 
-    step = 0.1 / 1000
+    step = 0.05 / 1000
     min_r = 1.0 / 1000
     min_h = d_co
     x = np.arange(min_r, r_o, step)
@@ -153,7 +156,7 @@ def draw_all_contours(outfile, m_Br, h, r_o, gap, t0_per_h_coil, d_co, k_co, a, 
     P  = np.zeros_like(X)
     N_arr  = np.zeros_like(X)
 
-#    start = time.time()
+    start = time.time()
     for i, r_i in enumerate(x):
         for j, h_coil in enumerate(y):
             m_r = r_i - gap
@@ -169,10 +172,10 @@ def draw_all_contours(outfile, m_Br, h, r_o, gap, t0_per_h_coil, d_co, k_co, a, 
     Z *= 1000   # convert displacement to mm
     P *= 1000   # convert power to mW
 
-#    end = time.time()
-#    print "Elapsed time : %.2f seconds to calculate %d points (%.1f/s)" % (end-start, x.size*y.size, x.size*y.size/(end-start))  
+    end = time.time()
+    print "Elapsed time : %.2f seconds to calculate %d points (%.1f/s)" % (end-start, x.size*y.size, x.size*y.size/(end-start))  
 
-    plot_contours(outfile, X, Y, Z, Rc, Rl, k, V, P, False, d_co, N_arr, norm, h, t0_per_h_coil, two_coils)
+    plot_contours(outfile, X, Y, Z, Rc, Rl, k, V, P, False, d_co, N_arr, norm, h, t0_per_h_coil, two_coils, ask)
 
 
 def main():
@@ -183,16 +186,22 @@ def main():
     d_co = 40e-6
     k_co = 0.6
 
-#    t0 = t0_per_h * h_coil
-    t0_per_h_coil = 0.75
 
 #    h = 0.01**3/(np.pi*r_o*r_o)
     h = 8.9 / 1000
 #    h = 9.0 / 1000
     a = 10.0
     f = 100.0
-    draw_all_contours("Spreemann_one_coil.pdf", m_Br, h, r_o, gap, t0_per_h_coil, d_co, k_co, a, f, False, False)
-    draw_all_contours("Spreemann_two_coils.pdf", m_Br, h, r_o, gap, t0_per_h_coil, d_co, k_co, a, f, True, False)
+
+#    t0 = t0_per_h * h_coil
+    t0_per_h_coil = 0.75
+    draw_all_contours("Spreemann_one_coil.pdf", m_Br, h, r_o, gap, t0_per_h_coil, d_co, k_co, a, f, False, False, True)
+#    draw_all_contours("Spreemann_two_coils.pdf", m_Br, h, r_o, gap, t0_per_h_coil, d_co, k_co, a, f, True, False, False)
+
+    t0_per_h_coil = 0.797
+    draw_all_contours("Spreemann_one_coil_t0.pdf", m_Br, h, r_o, gap, t0_per_h_coil, d_co, k_co, a, f, False, False, True)
+    t0_per_h_coil = 0.990
+    draw_all_contours("Spreemann_two_coils_t0.pdf", m_Br, h, r_o, gap, t0_per_h_coil, d_co, k_co, a, f, True, False, True)
 
 
 if __name__ == "__main__":

@@ -29,7 +29,7 @@ d_co = 40e-6
 a = 10.0
 f = 50.0
 m_Br = 1.1
-two_coils = False
+two_coils = True
 
 creator.create("FitnessMax", base.Fitness, weights=(1.0,))
 creator.create("Individual", array.array, typecode="d", fitness=creator.FitnessMax, strategy=None)
@@ -59,25 +59,25 @@ def checkBounds(min, max):
 
 
 def evalOneMax(individual, r_o, h, gap, k_co, d_co, a, f, m_Br, two_coils, printing):
-    R_ratio  = individual[0]
-    H_ratio  = individual[1]
-    T_ratio  = individual[2]
+    R_ratio = individual[0]
+    H_ratio = individual[1]
+    T_ratio = individual[2]
 #    T_ratio  = 0.75
 
-    r_i = R_ratio * r_o
-    r_mag     = r_i - gap
+    r_i    = R_ratio * r_o
+    r_mag  = r_i - gap
     h_coil = H_ratio * h
     t0     = T_ratio * h_coil
-    h_mag = h - h_coil + t0
-
     N = int(round(4.0 * h_coil * (r_o - r_i) * k_co / (d_co * d_co * np.pi)))
 
     if two_coils:
+        h_mag = h - 2 * h_coil + 2 * t0
         P = calc_power_two_coils(m_Br, h_mag, r_mag, h_coil, r_i, r_o, N, d_co, t0, a, f)
     else:
+        h_mag = h - h_coil + t0
         P = calc_power(m_Br, h_mag, r_mag, h_coil, r_i, r_o, N, d_co, t0, a, f)
-    if printing:
 
+    if printing:
         print "R_ratio = %.2f, H_ratio = %.2f, T_ratio = %.2f, r_i = %.3f, r_o = %.3f, h_coil = %.3f, h_mag = %.3f, h = %.3f, N = %d, P = %.3f mW" % (R_ratio, H_ratio, T_ratio, r_i*1000, r_o*1000, h_coil*1000, h_mag*1000, h*1000, N, P*1000)
     return P,
 
@@ -99,7 +99,7 @@ toolbox.decorate("mutate", checkBounds(ratio_min, ratio_max))
 def main():
     random.seed()
     NGEN = 50
-    MU, LAMBDA = 100, 100
+    MU, LAMBDA = 500, 500
     pop = toolbox.population(n=MU)
     hof = tools.HallOfFame(1)
     fit_stats = tools.Statistics(lambda ind: ind.fitness.values)
@@ -189,16 +189,29 @@ def main():
     r_mag     = r_i - gap
     h_coil = H_ratio * h
     t0     = T_ratio * h_coil
-    h_mag = h - h_coil + t0
     N = int(round(4.0 * h_coil * (r_o - r_i) * k_co / (d_co * d_co * np.pi)))
     P_max = hof[0].fitness.values[0] * 1000
 
     if two_coils:
+        h_mag = h - 2 * h_coil + 2 * t0
         outfile = "fixed_ratio_optimum_es2.pdf"
     else:
+        h_mag = h - h_coil + t0
         outfile = "fixed_ratio_optimum_es.pdf"
 
     draw_flux_lines_coil(outfile, m_Br, r_mag, h_mag, r_i, r_o, h_coil, N, d_co, t0, P_max, two_coils, False, a, f)
+
+    if two_coils:
+        Z, R_coil, R_load, k, V_load, P = calc_power_all_two_coils(m_Br, h_mag, r_mag, h_coil, r_i, r_o, N, d_co, t0, a, f)
+    else:
+        Z, R_coil, R_load, k, V_load, P = calc_power_all(m_Br, h_mag, r_mag, h_coil, r_i, r_o, N, d_co, t0, a, f)
+
+    h_mag_per_h = h_mag / h
+    t0_per_h_coil = t0 / h_coil
+    print "P_load = %.2f mW, V_load = %.2f V, r_i = %.2f mm, h_coil = %.2f mm, h_mag/h = %.3f, t0/h_coil = %.3f" % (P_max, V_load, r_i * 1000, h_coil * 1000, h_mag_per_h, t0_per_h_coil)
+
+    tolerance = 0.1 / 1000
+    harvester_sensitivity(m_Br, h_mag, r_mag, h_coil, r_i, r_o, N, d_co, t0, a, f, two_coils, tolerance)
 
     return pop, logbook, hof
 
