@@ -431,7 +431,11 @@ def flux_linkage_Derby_axial(Br, h_mag, r_mag, h_coil, r_i, r_o, k_co, d_co, d, 
     Nz_float = 2 * h_coil / (d_co * np.sqrt(np.pi / k_co))
     Nr_float = 2 * (r_o - r_i) / (d_co * np.sqrt(np.pi / k_co))
     Nr = int(round(Nr_float))
+    if Nr == 0:
+        Nr = 1
     Nz = int(round(Nz_float))
+    if Nz == 0:
+        Nz = 1
     dN = Nz_float / Nz * Nr_float / Nr
 
     FL = 0.0
