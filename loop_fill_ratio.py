@@ -61,6 +61,8 @@ def evalOneMax(individual, r_o, h, gap, k_co, d_co, a, f, m_Br, two_coils, print
 
     r_i    = R_ratio * r_o
     r_mag  = r_i - gap
+    if r_mag < d_co:
+        r_mag = d_co
     h_coil = H_ratio * h
     t0     = T_ratio * h_coil
     N = int(round(4.0 * h_coil * (r_o - r_i) * k_co / (d_co * d_co * np.pi)))
@@ -78,7 +80,7 @@ def evalOneMax(individual, r_o, h, gap, k_co, d_co, a, f, m_Br, two_coils, print
 
 def main():
 
-    fillratio = np.arange(0.4, 0.85, 0.05)
+    fillratio = np.arange(0.4, 0.85, 0.02)
     P1 = np.zeros(fillratio.size)
     P2 = np.zeros(fillratio.size)
 
