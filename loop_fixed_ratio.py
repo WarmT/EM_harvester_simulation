@@ -229,8 +229,8 @@ def main():
     #############
 
     fig, axes = plt.subplots(facecolor='white', figsize=(12, 6))
-    plt.plot(r_oo, P1, label="One Coil")
-    plt.plot(r_oo, P2, label="Two Coils")
+    plt.plot(r_oo * 1000, P1, label="One Coil")
+    plt.plot(r_oo * 1000, P2, label="Two Coils")
     plt.ylabel(r"$P_\mathrm{load,max}\,\,[\mathrm{mW}]$", fontsize='large')
     plt.xlabel(r"$r_\mathrm{o}\,\,[\mathrm{mm}]$", fontsize='large')
     plt.legend(loc=2)
@@ -241,7 +241,7 @@ def main():
     raw_input("tadaa")
 
     fig, axes = plt.subplots(facecolor='white', figsize=(12, 6))
-    plt.plot(r_oo, np.divide(P2, P1), label=r"$P_\mathrm{2\,coils}/P_\mathrm{1\,coil}$")
+    plt.plot(r_oo * 1000, np.divide(P2, P1), label=r"$P_\mathrm{2\,coils}/P_\mathrm{1\,coil}$")
     plt.xlabel(r"$r_\mathrm{o}\,\,[\mathrm{mm}]$" , fontsize='large')
 #    plt.ylabel(r"$\textit{power ratio}$", fontsize='x-large')
     plt.legend(loc=1)
