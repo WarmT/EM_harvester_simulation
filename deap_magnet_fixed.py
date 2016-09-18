@@ -173,7 +173,7 @@ def main():
     fig.subplots_adjust(wspace=0.01, hspace=0.1, left=0.02, right=0.99, top=0.98, bottom=0.03)
     plt.show(block=False)
     raw_input("hit any key!")
-    plt.savefig("optim_progress_es.pdf")
+    plt.savefig("M_optim_progress_es.pdf")
     plt.close()
 
     hof_array = np.array(hof)
