@@ -8,3 +8,4 @@ pics/*
 *.csv
 *.xls
 *.xlsx
+._*
