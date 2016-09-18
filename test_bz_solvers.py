@@ -665,96 +665,6 @@ def test_flux_linkage2():
     plt.savefig("flux_linkage.pdf")
     plt.close()
 
-def test_flux_linkage_N500():
-    coil_r1 = 12.05 / 2 / 1000   # inner radius of the coil = 12.05/2 mm 
-    coil_r2 = 16.3 / 2 / 1000  # outer radios of the coil = 25.3/2 mm
-    coil_h = 12.1 / 1000 # coil height is 6.2 mm
-
-    # Parameters for prototype 3
-    N = 500  # number of turns
-#    m_D = 12 / 1000 # diameter of the magnet = 9.525 mm
-    m_D = 9.525 / 1000 # diameter of the magnet = 9.525 mm
-#    m_D = 9.36 / 1000 # diameter of the magnet = 9.525 mm
-    m_r = m_D/2
-    m_h = 19.05 / 1000 # lenngth of the magnet = 19.05 mm
-    m_Br = 1.32
-    
-    d_co = 200e-6
-    k_co = np.pi * d_co * d_co * N / ( 4 * coil_h * ( coil_r2 - coil_r1 ) )    
-
-    step = 0.0001
-    step = coil_h / 100
-
-    Nz_float = 2 * coil_h / (d_co * np.sqrt(np.pi/k_co))
-    Nz = int(round(Nz_float))
-    step = coil_h / (Nz)
-    
-    offset = 0.0
-    dd = np.arange(-3*m_h+offset, 3*m_h+step+offset, step)
-    FL_Derby_all = np.zeros(dd.size)
-    FL_Derby_fast = np.zeros(dd.size)
-    
-    parts = 5
-    step_no = dd.size
-    print "Number of steps: %d" % (step_no)
-    start = time.time()
-    progress = 0
-    percentile = int(round(dd.size/100))
-    t_start1 = time.time()
-    for ind, d in enumerate(dd):
-#        if ind % percentile == 0:
-#            progress += 1
-#            sys.stdout.write("Calculation progress: %d%%   \r" % (progress) )
-#            sys.stdout.flush()
-
-        tmp = flux_linkage_Derby_axial(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)#, 51)
-        FL_Derby_all[ind] = tmp
-    t_stop1 = time.time()
-    print "flux_linkage_Derby_axial:      elapsed time = %.4f" % (t_stop1 - t_start1)
-
-    end = time.time()
-    print "Elapsed time : %.2f seconds (%.2f ms/step)" % (end-start, (end-start)/step_no*1000)
-    
-    dz_flux_all = ( FL_Derby_all[1:] - FL_Derby_all[:-1] ) / step
-#    dz_flux_fast = ( FL_Derby_fast[1:] - FL_Derby_fast[:-1] ) / step
-    dz = dd[:-1] + step/2    
-
-
-    fig, ax1 = plt.subplots(facecolor='white', figsize=(17, 9))
-    ax1.set_xlabel("z [mm]")
-    ax1.set_ylabel(r"$\lambda\,\, [\,Wb-t\,]$", color='b')
-    for tl in ax1.get_yticklabels():
-        tl.set_color('b')
-    plt.title('Flux linkage')
-
-    ax1.plot(dd*1000, FL_Derby_all, label = "Derby_all")
- #   ax1.plot(dd*1000, FL_Derby_fast, label = "Derby_fast")
-
-    
-    plt.axvline(-m_h*1000/2, 0, 1, color='black')
-    plt.axvline( m_h*1000/2, 0, 1, color='black')
-    plt.axvline(0, 0, 1, color='black')
-
-    ax2 = ax1.twinx()
-    ax2.set_ylabel('V/(m/s)', color='r')
-    for tl in ax2.get_yticklabels():
-        tl.set_color('r')
-
-    ax2.plot(dz*1000, dz_flux_all, 'r', label = "Flux gradient (Derby_all)")
-    ax2.plot(dz*1000, dz_flux_all, 'r.')
-#    ax2.plot(dz*1000, dz_flux_fast, 'b')
-
-    scale = plt.axis()
-    plt.axis([-30, 30, scale[2], scale[3]])
-
-    ax1.legend(loc=3)
-    ax2.legend(loc=4)
-
-    plt.show(block=False)    
-    raw_input("end of plotting")
-
-    plt.savefig("flux_linkage.pdf")
-    plt.close()
 
 def test_flux_linkage3():
     coil_r1 = 12.05 / 2 / 1000   # inner radius of the coil = 12.05/2 mm 
@@ -802,47 +712,6 @@ def test_flux_linkage3():
     phi = flux_linkage_nasa_axial(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, parts)#, 51)
     print "d = % .4f, phi = % .5f" % (d, phi)
 
-
-def test_flux_linkage5():
-    coil_r1 = 12.05 / 2 / 1000   # inner radius of the coil = 12.05/2 mm
-    coil_r2 = 25.8 / 2 / 1000  # outer radios of the coil = 25.3/2 mm
-    coil_h = 6.2 / 1000  # coil height is 6.2 mm
-
-    # Parameters for prototype 3
-#    N = 3000  # number of turns
-#    m_D = 9.35 / 1000 # diameter of the magnet = 9.525 mm
-    m_D = 9.525 / 1000  # diameter of the magnet = 9.525 mm
-    m_r = m_D / 2
-#    m_h = 19.05 / 1000  # lenngth of the magnet = 19.05 mm
-    m_h = 1.05 / 1000  # lenngth of the magnet = 19.05 mm
-    m_Br = 1.2
-
-    k_co = 0.55277
-    d_co = 100e-6
-
-    d = 0.00 * m_h
-
-    steps = 15
-    FL_Derby = np.zeros(steps)
-    FL_Derby_fast = np.zeros(steps)
-
-    start = time.time()
-    for i in xrange(1, steps):
-        FL_Derby[i] = flux_linkage_Derby_axial(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, i)
-#        FL_Derby_fast[i] = flux_linkage_Derby_axial_fast(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, k_co, d_co, d, i)
-    end = time.time()
-    print "Elapsed time : %.2f seconds" % (end - start)
-
-    plt.figure(facecolor='white', figsize=(17, 9))
-#    plt.plot(phi_Derby, label = "Flux linkage (z = 0 mm)")
-#    plt.plot(phi_Derby, 'o', label = "Derby (z = 0 mm)")
-    plt.plot(FL_Derby, label="Derby (z = 0 mm)")
-    plt.plot(FL_Derby_fast, label="Derby_fast (z = 0 mm)")
-    plt.legend(loc=4)
-    plt.show(block=False)
-
-    raw_input("end of plotting")
-#    plt.close()
 
 
 def draw_flux_lines():
@@ -1279,11 +1148,11 @@ def main():
 #    test_bz_solvers()
 #    test_flux_slice()
 
-    test_flux_linkage_N500()
+#    test_flux_linkage_N500()
 #    test_flux_linkage()
 #    test_flux_linkage2()
 #    test_flux_linkage3()
-    test_flux_linkage5()
+#    test_flux_linkage5()
 
 
     m_Br = 1.1
@@ -1391,8 +1260,8 @@ def main():
 #    print "d_co = %d um" % (int(d_co*1e6))
     a = 10.0
     f = 100.0
-    draw_all_contours_magnet_fixed("m_fixed_coils1_norm.pdf", m_Br, m_h, m_r, gap, max_r, max_h, t0_per_h_coil, d_co, a, f, False, True)   # two_coils = False, norm = True
-    draw_all_contours_magnet_fixed("m_fixed_coils2_norm.pdf", m_Br, m_h, m_r, gap, max_r, max_h, t0_per_h_coil, d_co, a, f, True, True)    # two_coils = True, norm = False
+#    draw_all_contours_magnet_fixed("m_fixed_coils1_norm.pdf", m_Br, m_h, m_r, gap, max_r, max_h, t0_per_h_coil, d_co, a, f, False, True)   # two_coils = False, norm = True
+#    draw_all_contours_magnet_fixed("m_fixed_coils2_norm.pdf", m_Br, m_h, m_r, gap, max_r, max_h, t0_per_h_coil, d_co, a, f, True, True)    # two_coils = True, norm = False
 
 if __name__ == "__main__":
     main()
