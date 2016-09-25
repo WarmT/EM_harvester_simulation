@@ -720,14 +720,17 @@ def draw_flux_lines_coil(outfile, m_Br, r_mag, h_mag, r_i, r_o, h_coil, N, d_co,
                                        h_coil, facecolor='yellow', alpha=0.2))
 
     if P_max < 10:
-        title = (r"$N = %d,\,d_\mathrm{co} = %d\,\mathrm{\mu m},\,$" +
+        title = (r"$N = %d,\,r_\mathrm{o} = %.2f\,\mathrm{mm},\,$" +
                  r"$r_\mathrm{i} = %.2f\,\mathrm{mm},\,h_\mathrm{coil} = %.2f\,\mathrm{mm},\,$" +
-                 r"$t_\mathrm{0} = %.2f\,\mathrm{mm},\,P_\mathrm{max} = %.2f,\,\mathrm{mW},\,$" +
-                 r"$V_\mathrm{load} = %.2f \,\mathrm{V}$") % (N, int(round(d_co * 1e6)),
+                 r"$t_\mathrm{0} = %.2f\,\mathrm{mm},\,P_\mathrm{max} = %.2f\,\mathrm{mW},\,$" +
+                 r"$V_\mathrm{load} = %.2f \,\mathrm{V}$") % (N, r_o,
                                                               r_i, h_coil, t0, P_max, V_load)
     else:
-        title = (r"$B_r = %.1f\,\mathrm{T},\,N = %d,\,d_\mathrm{co} = %d\,\mathrm{um},\,$" +
-                 r"$P_\mathrm{max} = %.1f\,\mathrm{mW}$") % (m_Br, N, int(round(d_co * 1e6)), P_max)
+        title = (r"$N = %d,\,r_\mathrm{o} = %.2f\,\mathrm{mm},\,$" +
+                 r"$r_\mathrm{i} = %.2f\,\mathrm{mm},\,h_\mathrm{coil} = %.2f\,\mathrm{mm},\,$" +
+                 r"$t_\mathrm{0} = %.2f\,\mathrm{mm},\,P_\mathrm{max} = %.1f\,\mathrm{mW},\,$" +
+                 r"$V_\mathrm{load} = %.2f \,\mathrm{V}$") % (N, r_o,
+                                                              r_i, h_coil, t0, P_max, V_load)
 
     plt.title(title)
     plt.axis([-xmax, xmax, -ymax, ymax])
@@ -737,7 +740,8 @@ def draw_flux_lines_coil(outfile, m_Br, r_mag, h_mag, r_i, r_o, h_coil, N, d_co,
 
     plt.show(block=False)
     plt.savefig(outfile)
-    raw_input("tadaa!")
+    plt.close()
+#    raw_input("tadaa!")
 
 
 def harvester_sensitivity(m_Br, h_mag, r_mag, h_coil, r_i, r_o, N, d_co, t0, a, f, two_coils, tolerance):
