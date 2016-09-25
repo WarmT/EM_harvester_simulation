@@ -22,11 +22,11 @@ smin = 0.2
 xmax = 6.3
 ymax = 3.0
 
+d_co = 50e-6
 k_co = 0.756 * 0.907
 r_o = 6e-3
 h = 8.9e-3
 gap = 0.5e-3
-d_co = 50e-6
 a = 10.0
 f = 50.0
 m_Br = 1.1
@@ -163,7 +163,7 @@ def main():
         H_ratio1[i]  = hof_array[0][1]
         T_ratio1[i]  = hof_array[0][2]
 
-        print "R_ratio1 = %.3f, H_ratio = %.3f, T_ratio = %.3f" % (R_ratio1[i], H_ratio1[i], T_ratio1[i])
+        print "R_ratio = %.3f, H_ratio = %.3f, T_ratio = %.3f" % (R_ratio1[i], H_ratio1[i], T_ratio1[i])
 
         r_i = R_ratio1[i] * r_o
         r_mag     = r_i - gap
