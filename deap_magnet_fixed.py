@@ -17,17 +17,20 @@ smin = 0.2
 
 V = 0.01**3  # 1 cm^3
 
-m_r = 9.525e-3 / 2
-m_h = 19.05e-3
-m_V = np.pi * m_r * m_r * m_h
+r_mag = 9.525e-3 / 2
+h_mag = 19.05e-3
+m_V = np.pi * r_mag * r_mag * h_mag
 print "V = %.e, m_V = %.e, m_V/V = %.2f" % (V, m_V, m_V / V)
 
-m_Br = 1.3
+m_Br = 1.31
 gap = 1.26e-3
-R_max_ratio = 2.0
-two_coils = False
-k_co = 0.6
-d_co = 100e-6
+R_max_ratio = 3.0
+two_coils = True
+d_co = 150e-6
+k_co = 0.790 * 0.907  # k_co for d_co = 100 um
+k_co = 0.812 * 0.907  # k_co for d_co = 100 um
+a = 10.0
+f = 50.0
 
 
 creator.create("FitnessMax", base.Fitness, weights=(1.0,))
@@ -57,27 +60,27 @@ def checkBounds(min, max):
     return decorator
 
 
-def evalOneMax(individual, m_r, m_h, R_max_ratio, gap, k_co, d_co, a, f, m_Br, two_coils, printing):
+def evalOneMax(individual, r_mag, h_mag, R_max_ratio, gap, k_co, d_co, a, f, m_Br, two_coils, printing):
     R_ratio  = individual[0]
     H_ratio  = individual[1]
     T_ratio  = individual[2]
 
-    coil_r1 = m_r + gap
-    coil_r2 = coil_r1 * (1 + R_ratio * R_max_ratio)
-    if coil_r2 - coil_r1 < d_co:
-        coil_r2 = coil_r1 + d_co
-    coil_h  = H_ratio * m_h
-    t0      = T_ratio * coil_h
+    r_i = r_mag + gap
+    r_o = r_i * (1 + R_ratio * R_max_ratio)
+    if r_o - r_i < d_co:
+        r_o = r_i + d_co
+    h_coil  = H_ratio * h_mag
+    t0      = T_ratio * h_coil
 
-    N = int(round(4.0 * coil_h * (coil_r2 - coil_r1) * k_co / (d_co * d_co * np.pi)))
+    N = int(round(4.0 * h_coil * (r_o - r_i) * k_co / (d_co * d_co * np.pi)))
 
     if two_coils:
-        P = calc_power_two_coils(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, N, d_co, t0, a, f)
+        P = calc_power_two_coils(m_Br, h_mag, r_mag, h_coil, r_i, r_o, N, d_co, t0, a, f)
     else:
-        P = calc_power(m_Br, m_h, m_r, coil_h, coil_r1, coil_r2, N, d_co, t0, a, f)
+        P = calc_power(m_Br, h_mag, r_mag, h_coil, r_i, r_o, N, d_co, t0, a, f)
 
     if printing:
-        print "R_ratio = %.2f, H_ratio = %.2f, T_ratio = %.2f, coil_r1 = %.2f, coil_r2 = %.2f, coil_h = %.2f, m_r = %.2f, m_h = %.2f, m_r/m_h = %.2f, N = %d, P = %.2f mW" % (R_ratio, H_ratio, T_ratio, coil_r1*1000, coil_r2*1000, coil_h*1000, m_r*1000, m_h*1000, m_r/m_h, N, P*1000)
+        print "R_ratio = %.2f, H_ratio = %.2f, T_ratio = %.2f, r_i = %.2f, r_o = %.2f, h_coil = %.2f, r_mag = %.2f, h_mag = %.2f, r_mag/h_mag = %.2f, N = %d, P = %.2f mW" % (R_ratio, H_ratio, T_ratio, r_i*1000, r_o*1000, h_coil*1000, r_mag*1000, h_mag*1000, r_mag/h_mag, N, P*1000)
     return P,
 
 toolbox = base.Toolbox()
@@ -88,7 +91,7 @@ toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 toolbox.register("mate", tools.cxESBlend, alpha=0.1)
 toolbox.register("mutate", tools.mutESLogNormal, c=1.0, indpb=0.03)
 toolbox.register("select", tools.selTournament, tournsize=3)
-toolbox.register("evaluate", evalOneMax, m_r=m_r, m_h=m_h, R_max_ratio=R_max_ratio,
+toolbox.register("evaluate", evalOneMax, r_mag=r_mag, h_mag=h_mag, R_max_ratio=R_max_ratio,
                  gap=gap, k_co=k_co, d_co=d_co, a=10.0, f=50.0, m_Br=m_Br,
                  two_coils=two_coils, printing=False)
 
@@ -173,7 +176,10 @@ def main():
     fig.subplots_adjust(wspace=0.01, hspace=0.1, left=0.02, right=0.99, top=0.98, bottom=0.03)
     plt.show(block=False)
     raw_input("hit any key!")
-    plt.savefig("M_optim_progress_es.pdf")
+    if two_coils:
+        plt.savefig("M_optim_progress_two_coils.pdf")
+    else:
+        plt.savefig("M_optim_progress_one_coils.pdf")
     plt.close()
 
     hof_array = np.array(hof)
@@ -182,16 +188,30 @@ def main():
     H_ratio  = hof_array[0][1]
     T_ratio  = hof_array[0][2]
 
-    coil_r1 = m_r + gap
-    coil_r2 = coil_r1 * (1 + R_ratio * R_max_ratio)
-    coil_h  = H_ratio * m_h
-    t0      = T_ratio * coil_h
-    N = int(round(4.0 * coil_h * (coil_r2 - coil_r1) * k_co / (d_co * d_co * np.pi)))
+    r_i = r_mag + gap
+    r_o = r_i * (1 + R_ratio * R_max_ratio)
+    h_coil  = H_ratio * h_mag
+    t0      = T_ratio * h_coil
+    N = int(round(4.0 * h_coil * (r_o - r_i) * k_co / (d_co * d_co * np.pi)))
     P_max = hof[0].fitness.values[0] * 1000
 
-    draw_flux_lines_coil("M_fixed_optimum_es.pdf", m_Br, m_r, m_h, coil_r1, coil_r2, coil_h, N, d_co, t0, P_max, two_coils)
+    t0_per_h_coil = t0 / h_coil
 
-    return pop, logbook, hof
+    if two_coils:
+        outfile = "M_fixed_optimum_two_coils.pdf"
+        Z, R_coil, R_load, k, V_load, P = calc_power_all_two_coils(m_Br, h_mag, r_mag, h_coil, r_i, r_o, N, d_co, t0, a, f)
+        print "Two coils: P_load = %.2f mW, V_load = %.2f V, r_i = %.2f, r_o = %.2f, h_coil = %.2f, r_mag = %.2f, h_mag = %.2f, t0/h_coil = %.3f, gap = %.2f, N = %d, R_load = %d" % (P_max, V_load, r_i * 1000, r_o * 1000, h_coil * 1000, r_mag * 1000, h_mag * 1000, t0_per_h_coil, gap * 1000, N, R_load)
+    else:
+        outfile = "M_fixed_optimum_one_coil.pdf"
+        Z, R_coil, R_load, k, V_load, P = calc_power_all(m_Br, h_mag, r_mag, h_coil, r_i, r_o, N, d_co, t0, a, f)
+        print "One coil:  P_load = %.2f mW, V_load = %.2f V, r_i = %.2f, r_o = %.2f, h_coil = %.2f, r_mag = %.2f, h_mag = %.2f, t0/h_coil = %.3f, gap = %.2f, N = %d, R_load = %d" % (P_max, V_load, r_i * 1000, r_o * 1000, h_coil * 1000, r_mag * 1000, h_mag * 1000, t0_per_h_coil, gap * 1000, N, R_load)
+
+    draw_flux_lines_coil(outfile, m_Br, r_mag, h_mag, r_i, r_o, h_coil, N, d_co, t0, P_max, two_coils, False, a, f)
+
+
+    print "\nB_r = %.1f T, d_co = %d um, k_co = %.3f" % (m_Br, d_co*1e6, k_co)
+
+#    return pop, logbook, hof
 
 
 if __name__ == "__main__":
