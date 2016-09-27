@@ -719,21 +719,25 @@ def draw_flux_lines_coil(outfile, m_Br, r_mag, h_mag, r_i, r_o, h_coil, N, d_co,
         ax.add_patch(patches.Rectangle((r_i, -h_mag / 2 + t0 - h_coil), r_o - r_i,
                                        h_coil, facecolor='yellow', alpha=0.2))
 
+    title_str = r"$N = %d,\,r_\mathrm{o} = %.2f\,\mathrm{mm},\,$" + \
+                r"$r_\mathrm{i} = %.2f\,\mathrm{mm},\,h_\mathrm{coil} =$" + \
+                r"$ %.2f\,\mathrm{mm},\,t_\mathrm{0} = %.2f\,\mathrm{mm}$"
+
     if P_max < 10:
-        title = (r"$N = %d,\,r_\mathrm{o} = %.2f\,\mathrm{mm},\,$" +
-                 r"$r_\mathrm{i} = %.2f\,\mathrm{mm},\,h_\mathrm{coil} = %.2f\,\mathrm{mm},\,$" +
-                 r"$t_\mathrm{0} = %.2f\,\mathrm{mm},\,P_\mathrm{max} = %.2f\,\mathrm{mW},\,$" +
-                 r"$V_\mathrm{load} = %.2f \,\mathrm{V}$") % (N, r_o,
-                                                              r_i, h_coil, t0, P_max, V_load)
+        p_str = r"$,\,P_\mathrm{max} = %.2f\,\mathrm{mW},\,$"
     else:
-        title = (r"$N = %d,\,r_\mathrm{o} = %.2f\,\mathrm{mm},\,$" +
-                 r"$r_\mathrm{i} = %.2f\,\mathrm{mm},\,h_\mathrm{coil} = %.2f\,\mathrm{mm},\,$" +
-                 r"$t_\mathrm{0} = %.2f\,\mathrm{mm},\,P_\mathrm{max} = %.1f\,\mathrm{mW},\,$" +
-                 r"$V_\mathrm{load} = %.2f \,\mathrm{V}$") % (N, r_o,
-                                                              r_i, h_coil, t0, P_max, V_load)
+        p_str = r"$,\,P_\mathrm{max} = %.1f\,\mathrm{mW},\,$"
+
+    if V_load < 10:
+        v_str = r"$V_\mathrm{load} = %.2f \,\mathrm{V}$"
+    else:
+        v_str = r"$V_\mathrm{load} = %.1f \,\mathrm{V}$"
+
+    title = (title_str + p_str + v_str) % (N, r_o, r_i, h_coil, t0, P_max, V_load)
 
     plt.title(title)
     plt.axis([-xmax, xmax, -ymax, ymax])
+    plt.axes().set_aspect('equal')
     plt.xlabel("(mm)")
     plt.ylabel("(mm)")
     fig.set_tight_layout(True)
