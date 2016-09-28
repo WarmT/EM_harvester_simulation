@@ -177,9 +177,9 @@ def main():
     plt.show(block=False)
     raw_input("hit any key!")
     if two_coils:
-        plt.savefig("M_optim_progress_two_coils.pdf")
+        plt.savefig("pics/M_optim_progress_two_coils.pdf")
     else:
-        plt.savefig("M_optim_progress_one_coils.pdf")
+        plt.savefig("pics/M_optim_progress_one_coils.pdf")
     plt.close()
 
     hof_array = np.array(hof)
