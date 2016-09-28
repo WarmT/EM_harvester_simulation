@@ -28,7 +28,7 @@ R_max_ratio = 3.0
 two_coils = True
 d_co = 150e-6
 k_co = 0.790 * 0.907  # k_co for d_co = 100 um
-k_co = 0.812 * 0.907  # k_co for d_co = 100 um
+k_co = 0.812 * 0.907  # k_co for d_co = 150 um
 a = 10.0
 f = 50.0
 
@@ -82,7 +82,7 @@ def evalOneMax(individual, r_mag, h_mag, R_max_ratio, gap, k_co, d_co, a, f, m_B
 def main():
     random.seed()
     NGEN = 50
-    MU, LAMBDA = 100, 100
+    MU, LAMBDA = 500, 500
 
     creator.create("FitnessMax", base.Fitness, weights=(1.0,))
     creator.create("Individual", array.array, typecode="d", fitness=creator.FitnessMax, strategy=None)
@@ -101,12 +101,30 @@ def main():
     toolbox.decorate("mutate", checkBounds(ratio_min, ratio_max))
 
     coils = [False, True]
-    S1_array   = np.array([0.790, 0.812, 0.826, 0.832])
-    d_co_array = np.array([100e-6, 150e-6, 200e-6, 250e-6])
+#    S1_array   = np.array([0.718, 0.756, 0.790, 0.812, 0.826, 0.832])
+    S1_array   = np.array([0.756, 0.790, 0.812, 0.826, 0.832])
+#    d_co_array = np.array([25e-6, 50e-6, 100e-6, 150e-6, 200e-6, 250e-6])
+    d_co_array = np.array([50e-6, 100e-6, 150e-6, 200e-6, 250e-6])
     P1 = np.zeros(d_co_array.size)
     P2 = np.zeros(d_co_array.size)
     V1 = np.zeros(d_co_array.size)
     V2 = np.zeros(d_co_array.size)
+    N1 = np.zeros(d_co_array.size)
+    N2 = np.zeros(d_co_array.size)
+    Rc1 = np.zeros(d_co_array.size)
+    Rc2 = np.zeros(d_co_array.size)
+    Rl1 = np.zeros(d_co_array.size)
+    Rl2 = np.zeros(d_co_array.size)
+    k1 = np.zeros(d_co_array.size)
+    k2 = np.zeros(d_co_array.size)
+    r_i1 = np.zeros(d_co_array.size)
+    r_i2 = np.zeros(d_co_array.size)
+    r_o1 = np.zeros(d_co_array.size)
+    r_o2 = np.zeros(d_co_array.size)
+    h_c1 = np.zeros(d_co_array.size)
+    h_c2 = np.zeros(d_co_array.size)
+    t_01 = np.zeros(d_co_array.size)
+    t_02 = np.zeros(d_co_array.size)
 
     for two_coils in coils:
         for i, d_co in enumerate(d_co_array):
@@ -141,32 +159,57 @@ def main():
             if two_coils:
                 P2[i] = P_max
                 Z, R_coil, R_load, k, V_load, P = calc_power_all_two_coils(m_Br, h_mag, r_mag, h_coil, r_i, r_o, N, d_co, t0, a, f)
-                V2[i] = V_load
+                V2[i]   = V_load
+                N2[i]   = N
+                Rc2[i]  = R_coil
+                Rl2[i]  = R_load
+                k2[i]   = k
+                r_i2[i] = r_i * 1000
+                r_o2[i] = r_o * 1000
+                h_c2[i] = h_coil * 1000
+                t_02[i] = t0 * 1000
             else:
                 P1[i] = P_max
                 Z, R_coil, R_load, k, V_load, P = calc_power_all(m_Br, h_mag, r_mag, h_coil, r_i, r_o, N, d_co, t0, a, f)
-                V1[i] = V_load
-
+                V1[i]  = V_load
+                N1[i]  = N
+                Rc1[i] = R_coil
+                Rl1[i] = R_load
+                k1[i]  = k
+                r_i1[i] = r_i * 1000
+                r_o1[i] = r_o * 1000
+                h_c1[i] = h_coil * 1000
+                t_01[i] = t0 * 1000
 
     fig, axes = plt.subplots(facecolor='white', figsize=(12, 6))
-    plt.plot(d_co_array*1e6, P2, 'r-', label=r"$P_\mathrm{load,max}$ (2 coils)")
-    plt.plot(d_co_array*1e6, P1, 'b-', label=r"$P_\mathrm{load,max}$ (1 coil)")
-    plt.plot(d_co_array*1e6, V2, 'r--', label=r"$V_\mathrm{load}$ (2 coils)")
-    plt.plot(d_co_array*1e6, V1, 'b--', label=r"$V_\mathrm{load}$ (1 coil)")
+    plt.plot(d_co_array[1:] * 1e6, P2[1:], 'r-', label=r"$P_\mathrm{load,max}$ (2 coils)")
+    plt.plot(d_co_array[1:] * 1e6, P1[1:], 'b-', label=r"$P_\mathrm{load,max}$ (1 coil)")
+    plt.plot(d_co_array[1:] * 1e6, V2[1:], 'r--', label=r"$V_\mathrm{load}$ (2 coils)")
+    plt.plot(d_co_array[1:] * 1e6, V1[1:], 'b--', label=r"$V_\mathrm{load}$ (1 coil)")
 #    plt.plot(d_co_array, P2, label="Two Coils")
     plt.ylabel(r"$[\mathrm{mW}]$ or $[\mathrm{V}]$", fontsize='large')
     plt.xlabel(r"$d_\mathrm{co}\,\,[\mathrm{um}]$", fontsize='large')
     plt.legend(loc=1)
 #    plt.yscale('log')
+    scale = plt.axis()
+    plt.axis([100, 250, scale[2], scale[3]])
+    plt.xticks(np.arange(100, 300, 50))
     fig.set_tight_layout(True)
     plt.show(block=False)
-    plt.savefig("loop_magnet_fixed_d_co.pdf")
+    plt.savefig("pics/loop_magnet_fixed_d_co.pdf")
     raw_input("tadaa")
 
+    print "\nB_r = %.1f T, d_co = %d um, k_co = %.3f" % (m_Br, d_co * 1e6, k_co)
 
-    print "\nB_r = %.1f T, d_co = %d um, k_co = %.3f" % (m_Br, d_co*1e6, k_co)
-
-#    return pop, logbook, hof
+    print "d_co [um], k_co, P [mW], V [V], N, k, R_coil [Ohm], R_load [Ohm], r_i, r_o, h_coil, t0"
+    for two_coils in coils:
+        print "%s" % ("Two_coils:" if two_coils else "One coil:  ")
+        for i, d_co in enumerate(d_co_array):
+            k_co = 0.907 * S1_array[i]
+            if two_coils:
+                print "%3d & %.3f & %6.2f & %5.2f & %4d & %5.2f & %5d & %5d & %5.2f & %5.2f & %5.2f & %5.2f" % (d_co * 1e6, k_co, P2[i], V2[i], N2[i], k2[i], Rc2[i], Rl2[i], r_i2[i], r_o2[i], h_c2[i], t_02[i])
+            else:
+                print "%3d & %.3f & %6.2f & %5.2f & %4d & %5.2f & %5d & %5d & %5.2f & %5.2f & %5.2f & %5.2f" % (d_co * 1e6, k_co, P1[i], V1[i], N1[i], k1[i], Rc1[i], Rl1[i], r_i1[i], r_o1[i], h_c1[i], t_01[i])
 
 
 if __name__ == "__main__":
