@@ -179,7 +179,8 @@ def main():
         h_mag_per_h = h_mag / h
         t0_per_h_coil = t0 / h_coil
         print "One coil:  P_load = %.2f mW, V_load = %.2f V, r_i = %.2f mm, h_coil = %.2f mm, h_mag/h = %.3f, t0/h_coil = %.3f" % (P_max, V_load, r_i * 1000, h_coil * 1000, h_mag_per_h, t0_per_h_coil)
-
+        print "P_max = %.4f mW, h_mag = %.4f mm, r_mag = %.4f mm" % (P_max, h_mag * 1000, r_mag * 1000)
+        raw_input("daa")
 
         V1[i] = V_load
         N1[i] = N
@@ -242,6 +243,8 @@ def main():
         h_mag_per_h = h_mag / h
         t0_per_h_coil = t0 / h_coil
         print "Two coils: P_load = %.2f mW, V_load = %.2f V, r_i = %.2f mm, h_coil = %.2f mm, h_mag/h = %.3f, t0/h_coil = %.3f" % (P_max, V_load, r_i * 1000, h_coil * 1000, h_mag_per_h, t0_per_h_coil)
+        print "P_max = %.4f mW, h_mag = %.4f mm, r_mag = %.4f mm" % (P_max, h_mag * 1000, r_mag * 1000)
+        raw_input("daa")
 
         V2[i] = V_load
         N2[i] = N
@@ -268,7 +271,7 @@ def main():
 #    plt.yscale('log')
     fig.set_tight_layout(True)
     plt.show(block=False)
-    plt.savefig("fixed_ratio_optim.pdf")
+    plt.savefig("pics/fixed_ratio_optim.pdf")
     raw_input("tadaa")
 
     fig, axes = plt.subplots(facecolor='white', figsize=(12, 6))
@@ -279,7 +282,7 @@ def main():
     plt.legend(loc=1)
     fig.set_tight_layout(True)
     plt.show(block=False)
-    plt.savefig("fixed_ratio_optim_relative.pdf")
+    plt.savefig("pics/fixed_ratio_optim_relative.pdf")
     raw_input("tadaa")
 
 
@@ -295,7 +298,7 @@ def main():
     plt.legend(loc=5)
     fig.set_tight_layout(True)
     plt.show(block=False)
-    plt.savefig("fixed_ratio_ratios.pdf")
+    plt.savefig("pics/fixed_ratio_ratios.pdf")
     raw_input("tadaa")
 
     fig, axes = plt.subplots(facecolor='white', figsize=(12, 6))
@@ -308,7 +311,7 @@ def main():
     plt.legend(loc=1)
     fig.set_tight_layout(True)
     plt.show(block=False)
-    plt.savefig("fixed_ratio_magnet_variation.pdf")
+    plt.savefig("pics/fixed_ratio_magnet_variation.pdf")
     raw_input("tadaa")
 
     print "r_o [mm] & h [mm] & V [cm^3] & P_1 [mW] & V_1 [V] & N_1 & R_1 [Ohm] & P_2 [mW] & V_1 [V] & N_1 & R_1 [Ohm] "
