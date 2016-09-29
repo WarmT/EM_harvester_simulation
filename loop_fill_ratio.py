@@ -146,7 +146,7 @@ def main():
     P_max = hof[0].fitness.values[0] * 1000
 
     h_mag = h - h_coil + t0
-    outfile = "fill_ratio_80_optimum_one_coil.pdf"
+    outfile = "pics/fill_ratio_80_optimum_one_coil.pdf"
 
     draw_flux_lines_coil(outfile, m_Br, r_mag, h_mag, r_i, r_o, h_coil, N, d_co, t0, P_max, two_coils, False, a, f)
 
@@ -201,7 +201,7 @@ def main():
     P_max = hof[0].fitness.values[0] * 1000
 
     h_mag = h - 2 * h_coil + 2 * t0
-    outfile = "fill_ratio_80_optimum_two_coils.pdf"
+    outfile = "pics/fill_ratio_80_optimum_two_coils.pdf"
 
     draw_flux_lines_coil(outfile, m_Br, r_mag, h_mag, r_i, r_o, h_coil, N, d_co, t0, P_max, two_coils, False, a, f)
 
@@ -226,7 +226,7 @@ def main():
     plt.legend(loc=2)
     fig.set_tight_layout(True)
     plt.show(block=False)
-    plt.savefig("fill_ratio_optim.pdf")
+    plt.savefig("pics/fill_ratio_optim.pdf")
     raw_input("tadaa")
 
 
