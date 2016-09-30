@@ -198,11 +198,11 @@ def main():
     t0_per_h_coil = t0 / h_coil
 
     if two_coils:
-        outfile = "M_fixed_optimum_two_coils.pdf"
+        outfile = "pics/M_fixed_optimum_two_coils.pdf"
         Z, R_coil, R_load, k, V_load, P = calc_power_all_two_coils(m_Br, h_mag, r_mag, h_coil, r_i, r_o, N, d_co, t0, a, f)
         print "Two coils: P_load = %.2f mW, V_load = %.2f V, r_i = %.2f, r_o = %.2f, h_coil = %.2f, r_mag = %.2f, h_mag = %.2f, t0/h_coil = %.3f, gap = %.2f, N = %d, R_load = %d" % (P_max, V_load, r_i * 1000, r_o * 1000, h_coil * 1000, r_mag * 1000, h_mag * 1000, t0_per_h_coil, gap * 1000, N, R_load)
     else:
-        outfile = "M_fixed_optimum_one_coil.pdf"
+        outfile = "pics/M_fixed_optimum_one_coil.pdf"
         Z, R_coil, R_load, k, V_load, P = calc_power_all(m_Br, h_mag, r_mag, h_coil, r_i, r_o, N, d_co, t0, a, f)
         print "One coil:  P_load = %.2f mW, V_load = %.2f V, r_i = %.2f, r_o = %.2f, h_coil = %.2f, r_mag = %.2f, h_mag = %.2f, t0/h_coil = %.3f, gap = %.2f, N = %d, R_load = %d" % (P_max, V_load, r_i * 1000, r_o * 1000, h_coil * 1000, r_mag * 1000, h_mag * 1000, t0_per_h_coil, gap * 1000, N, R_load)
 
