@@ -167,25 +167,18 @@ def draw_all_contours(outfile, m_Br, h_mag, r_mag, r_o_max, h_coil_max, gap, t0_
 
 def main():
 
-    m_Br = 1.1
-    r_o = 6.0 / 1000
-    gap = 0.5 / 1000
-    d_co = 40e-6
-    k_co = 0.6
 
-
-#    h = 0.01**3/(np.pi*r_o*r_o)
-    h = 8.9 / 1000
-#    h = 9.0 / 1000
     a = 10.0
     f = 100.0
 
     r_mag = 9.525e-3 / 2
     h_mag = 19.05e-3
-    m_V = np.pi * r_mag * r_mag * h_mag
 
+#    gap = 0.5e-3
+    gap = 1.26e-3
+    m_Br = 1.31
     d_co = 150e-6
-    k_co = 0.790 * 0.907  # k_co for d_co = 100 um
+#    k_co = 0.790 * 0.907  # k_co for d_co = 100 um
     k_co = 0.812 * 0.907  # k_co for d_co = 150 um
     r_o_max = r_mag * 6
     h_coil_max = h_mag * 2
