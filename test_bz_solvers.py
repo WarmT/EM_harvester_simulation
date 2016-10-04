@@ -110,7 +110,7 @@ def test_bz_solvers():
     t_derby = timeit.Timer(lambda: Derby_axial(Br, coil_r, hmag_per_2, r, z))
 
 
-    no = 10000
+    no = 100000
     print "starting first sweep"
     start = time.time()
     for ind, z in enumerate(zz):
@@ -124,7 +124,7 @@ def test_bz_solvers():
     fig = plt.figure(facecolor='white', figsize=(17, 9))
 
     plt.subplot(1,2,1)
-    plt.title('Magnetic flux density calculation', fontsize=12)
+    plt.title("Number of iteratin per z: %d" % no, fontsize=12)
     plt.xlabel('z')
     plt.ylabel('Time (s)', fontsize=10)
     plt.plot(zz, tt_Foelsch1, label="Foelsch1")
@@ -153,18 +153,19 @@ def test_bz_solvers():
     print "Elapsed time : %.2f seconds" % (end-start)    
 
     plt.subplot(1,2,2)
-    plt.title('Magnetic flux density calculation', fontsize=12)
+    plt.title("Number of iteratin per r: %d" % no, fontsize=12)
     plt.xlabel('r')
     plt.ylabel('Time (s)', fontsize=10)
     plt.plot(zz, tt_Foelsch1, label="Foelsch1")
     plt.plot(zz, tt_Foelsch2, label="Foelsch2")
     plt.plot(zz, tt_nasa, label="Nasa")
     plt.plot(zz, tt_derby, label="Derby")
-    plt.legend(loc=1)
+#    plt.legend(loc=1)
 
     fig.set_tight_layout(True)
     plt.show(block=False)
-#    plt.savefig(filename)
+    plt.savefig("pics/flux_density_speed.pdf")
+    time.sleep(1)
     raw_input("Hit enter")
     plt.close()
 
@@ -193,22 +194,68 @@ def plot_bz():
         z_derby[ind]    = Derby_axial(Br, coil_r, hmag_per_2, r, z)
         z_analytic[ind] = Br/2*((z+hmag_per_2)/np.sqrt((z+hmag_per_2)*(z+hmag_per_2)+coil_r*coil_r)-(z-hmag_per_2)/np.sqrt((z-hmag_per_2)*(z-hmag_per_2)+coil_r*coil_r))
 
-    fig = plt.figure(facecolor='white', figsize=(17, 6))
+    fig = plt.figure(facecolor='white', figsize=(17, 9))
+    plt.subplot(3, 1, 1)
     plt.plot(zz*1000, z_Foelsch1, label="Foelsch1")
     plt.plot(zz*1000, z_Foelsch2, label="Foelsch2")
+    plt.plot(zz*1000, z_nasa, label = "Nasa")
     plt.plot(zz*1000, z_derby, label = "Derby")
     plt.plot(zz*1000, z_analytic, label = "Analytic")
-    plt.plot(zz*1000, z_nasa, label = "Nasa")
 #    plt.xscale('log')
 #    plt.yscale('log')
 #    plt.axvline(1.2, 0, 1, color='black')
-    plt.xlabel("z [mm]")
+ #   plt.xlabel("z [mm]")
     plt.ylabel(r"$B_z\,\,[\,T\,]$")
     plt.title(r'Magnetic flux density $B_z$ ($r=0$)')
     plt.legend(loc=1)
-    fig.set_tight_layout(True)
     scale = plt.axis()
     plt.axis([-50, +50, scale[2], scale[3]])
+
+    err_Foelsch1 = np.divide((z_Foelsch1 - z_analytic), z_analytic)
+    err_Foelsch2 = np.divide((z_Foelsch2 - z_analytic), z_analytic)
+    err_nasa     = np.divide((z_nasa - z_analytic), z_analytic)
+    err_derby    = np.divide((z_derby - z_analytic), z_analytic)
+
+    plt.subplot(3, 1, 2)
+    plt.plot(zz*1000, err_Foelsch1, label="(Foelsch1 - Analytic) / Analytic")
+    plt.plot(zz*1000, err_Foelsch2, label="(Foelsch2 - Analytic) / Analytic")
+#    plt.plot(zz*1000, z_analytic, label = "Analytic")
+    plt.plot(zz*1000, err_nasa, label = "(Nasa - Analytic) / Analytic")
+    plt.plot(zz*1000, err_derby, label = "(Derby - Analytic) / Analytic")
+#    plt.xlabel("z [mm]")
+#    plt.ylabel(r"$B_z\,\,[\,T\,]$")
+#    plt.title(r'Magnetic flux density $B_z$ ($r=0$)')
+    plt.legend(loc=1)
+    scale = plt.axis()
+    plt.axis([-50, +50, scale[2], scale[3]])
+
+    plt.subplot(3, 1, 3)
+    plt.plot(zz*1000, err_Foelsch1, label="(Foelsch1 - Analytic) / Analytic")
+    plt.plot(zz*1000, err_Foelsch2, label="(Foelsch2 - Analytic) / Analytic")
+#    plt.plot(zz*1000, z_analytic, label = "Analytic")
+    plt.plot(zz*1000, err_nasa, label = "(Nasa - Analytic) / Analytic")
+    plt.plot(zz*1000, err_derby, label = "(Derby - Analytic) / Analytic")
+    plt.xlabel("z [mm]")
+#    plt.ylabel(r"$B_z\,\,[\,T\,]$")
+#    plt.title(r'Magnetic flux density $B_z$ ($r=0$)')
+#    plt.legend(loc=1)
+    scale = plt.axis()
+    plt.axis([-50, +50, -3e-14, 3e-14])
+
+    ax = [plt.subplot(3, 1, i + 1) for i in range(2)]
+    for i, a in enumerate(ax):
+        if i == 0:
+            ax2 = a
+        else:
+            ax1 = ax2
+            ax2 = a
+#            nbins = len(ax1.get_xticklabels()) # added 
+#            ax2.yaxis.set_major_locator(MaxNLocator(nbins=nbins, prune='upper')) # added #               
+        a.set_xticklabels([])
+
+
+    fig.set_tight_layout(True)
+
     plt.show(block=False)
     plt.savefig("Axial_flux1.pdf")
 
@@ -226,7 +273,7 @@ def plot_bz():
     print "z = %.5f" % (z)
     plt.close()
     
-    fig = plt.figure(facecolor='white', figsize=(17, 6))
+    fig = plt.figure(facecolor='white', figsize=(17, 9))
     zz = np.arange(0.0, 0.02, 0.00002)
     z_Foelsch1 = np.zeros(zz.size)
     z_Foelsch2 = np.zeros(zz.size)
@@ -239,17 +286,61 @@ def plot_bz():
         z_nasa[ind]     = nasa_axial(Br, coil_r, hmag_per_2, r, z)
         z_derby[ind]    = Derby_axial(Br, coil_r, hmag_per_2, r, z)
 
+    plt.subplot(3, 1, 1)
     plt.plot(zz*1000, z_Foelsch1, label="Foelsch1")
     plt.plot(zz*1000, z_Foelsch2, label="Foelsch2")
-    plt.plot(zz*1000, z_derby, label = "Derby")
     plt.plot(zz*1000, z_nasa, label = "Nasa")
+    plt.plot(zz*1000, z_derby, label = "Derby")
     plt.axhline(0, 0, 1.0, color='black')
 #    plt.xscale('log')
 #    plt.yscale('log')
-    plt.xlabel("r [mm]")
+#    plt.xlabel("r [mm]")
     plt.ylabel(r"$B_z\,\,[\,T\,]$")
     plt.title(r'Magnetic flux density $B_z$ ($z=%.1f\,mm$)' % (z*1000))
     plt.legend(loc=1)
+
+    err_Foelsch1 = np.divide((z_Foelsch1 - z_derby), z_derby)
+    err_Foelsch2 = np.divide((z_Foelsch2 - z_derby), z_derby)
+    err_nasa     = np.divide((z_nasa - z_derby), z_derby)
+
+    plt.subplot(3, 1, 2)
+    plt.plot(zz*1000, err_Foelsch1, label="(Foelsch1 - Derby) / Derby")
+    plt.plot(zz*1000, err_Foelsch2, label="(Foelsch2 - Derby) / Derby")
+    plt.plot(zz*1000, err_nasa, label = "(Nasa - Derby) / Derby")
+#    plt.axhline(0, 0, 1.0, color='black')
+#    plt.xscale('log')
+#    plt.yscale('log')
+#    plt.xlabel("r [mm]")
+#    plt.ylabel(r"$B_z\,\,[\,T\,]$")
+#    plt.title(r'Magnetic flux density $B_z$ ($z=%.1f\,mm$)' % (z*1000))
+    plt.legend(loc=1)
+
+    plt.subplot(3, 1, 3)
+    plt.plot(zz*1000, err_Foelsch1, label="(Foelsch1 - Derby) / Derby")
+    plt.plot(zz*1000, err_Foelsch2, label="(Foelsch2 - Derby) / Derby")
+    plt.plot(zz*1000, err_nasa, label = "Nnasa - Derby) / Derby")
+#    plt.axhline(0, 0, 1.0, color='black')
+#    plt.xscale('log')
+#    plt.yscale('log')
+    plt.xlabel("r [mm]")
+#    plt.ylabel(r"$B_z\,\,[\,T\,]$")
+#    plt.title(r'Magnetic flux density $B_z$ ($z=%.1f\,mm$)' % (z*1000))
+#    plt.legend(loc=1)
+    scale = plt.axis()
+    plt.axis([scale[0], scale[1], -1e-13, 1e-13])
+
+    ax = [plt.subplot(3, 1, i + 1) for i in range(2)]
+    for i, a in enumerate(ax):
+        if i == 0:
+            ax2 = a
+        else:
+            ax1 = ax2
+            ax2 = a
+#            nbins = len(ax1.get_xticklabels()) # added 
+#            ax2.yaxis.set_major_locator(MaxNLocator(nbins=nbins, prune='upper')) # added #               
+        a.set_xticklabels([])
+
+
     fig.set_tight_layout(True)
     plt.show(block=False)
     plt.savefig("Axial_flux2.pdf")
@@ -1145,7 +1236,7 @@ def main():
 #    print "Bz_Nasa     = % 1.20f" % (Bz_nasa)
 #    print "Bz_Derby    = % 1.20f" % (Bz_derby)
 
-#    test_bz_solvers()
+    test_bz_solvers()
 #    test_flux_slice()
 
 #    test_flux_linkage_N500()
@@ -1239,8 +1330,8 @@ def main():
 #    h = 9.0 / 1000
     a = 10.0
     f = 100.0
-    draw_all_contours("contour_test1.pdf", m_Br, h, coil_r2, gap, t0_per_h_coil, d_co, a, f, False, False) # two_coils = False, norm = False
-    draw_all_contours("contour_test2.pdf", m_Br, h, coil_r2, gap, t0_per_h_coil, d_co, a, f, True, False) # two_coils = False, norm = False
+#    draw_all_contours("contour_test1.pdf", m_Br, h, coil_r2, gap, t0_per_h_coil, d_co, a, f, False, False) # two_coils = False, norm = False
+#    draw_all_contours("contour_test2.pdf", m_Br, h, coil_r2, gap, t0_per_h_coil, d_co, a, f, True, False) # two_coils = False, norm = False
 
     ##########################################################
     # calculate optimal values for magnet used in drop tests #
