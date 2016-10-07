@@ -6,16 +6,16 @@ from numba import jit
 
 
 @jit
-def calc_force_dist(m1_r, m1_t, m1_Br, m2_r, m2_t, m2_Br, h, Nr, Nphi):
+def calc_force_dist(r_m1, h_m1, Br_m1, r_m2, h_m2, Br_m2, d, Nr, Nphi):
     mu0 = 1.256637e-6
-    m1_Ms = m1_Br / mu0          # 1.32 T / mu0
-    m2_Ms = m2_Br / mu0          # 1.32 T / mu0
-    m1_Rslice = (m1_r * m1_r) / Nr
-    m2_Rslice = (m2_r * m2_r) / Nr
+    m1_Ms = Br_m1 / mu0
+    m2_Ms = Br_m2 / mu0
+    m1_Rslice = (r_m1 * r_m1) / Nr
+    m2_Rslice = (r_m2 * r_m2) / Nr
     const = mu0 * m1_Ms * m2_Ms * Nphi / (4 * pi) * multiply(pi * m1_Rslice / Nphi, pi * m2_Rslice / Nphi)
 
     delta_phi = 2 * pi / Nphi
-    hm = array([h, -(h + m1_t), -(h + m2_t), (h + m1_t + m2_t)], dtype='float')
+    hm = array([d, -(d + h_m1), -(d + h_m2), (d + h_m1 + h_m2)], dtype='float')
     S1 = 0.0
     R_i_prev = 0.0
     for i in range(0, Nr):
@@ -55,19 +55,19 @@ def calc_force_dist(m1_r, m1_t, m1_Br, m2_r, m2_t, m2_Br, h, Nr, Nphi):
     return F
 
 
-def calc_force(m1_r, m1_t, m1_Br, m2_r, m2_t, m2_Br, h_range, Nr, Nphi):
+def calc_force(r_m1, h_m1, Br_m1, r_m2, h_m2, Br_m2, h_range, Nr, Nphi):
     F = np.zeros(h_range.size)
-    for index, h in enumerate(h_range):
-        F[index] = calc_force_dist(m1_r, m1_t, m1_Br, m2_r, m2_t, m2_Br, h, Nr, Nphi)
+    for index, d in enumerate(h_range):
+        F[index] = calc_force_dist(r_m1, h_m1, Br_m1, r_m2, h_m2, Br_m2, d, Nr, Nphi)
     return F
 
 
-def calc_force_to_moving_magnet(m1_r, m1_t, m1_Br, m2_r, m2_t, m2_Br, Nr, Nphi, d0, h_steps):
+def calc_force_to_moving_magnet(r_m1, h_m1, Br_m1, r_m2, h_m2, Br_m2, Nr, Nphi, d_sep, h_steps):
     h_min = 0.001  # minimum distance between opposing magnets is 1 mm
-    h_range = np.linspace(h_min, 2 * d0, 2 * h_steps)
-    F = calc_force(m1_r, m1_t, m1_Br, m2_r, m2_t, m2_Br, h_range, Nr, Nphi)
+    h_range = np.linspace(h_min, 2 * d_sep, 2 * h_steps)
+    F = calc_force(r_m1, h_m1, Br_m1, r_m2, h_m2, Br_m2, h_range, Nr, Nphi)
     fem_int = interp1d(h_range, F, kind='cubic')
 
-    x_int = np.linspace(-d0 + 2 * h_min, d0 - 2 * h_min, h_steps)
-    F_int = fem_int(d0 - x_int) - fem_int(d0 + x_int)
+    x_int = np.linspace(-d_sep + 2 * h_min, d_sep - 2 * h_min, h_steps)
+    F_int = fem_int(d_sep - x_int) - fem_int(d_sep + x_int)
     return (x_int, F_int)
