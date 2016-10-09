@@ -40,19 +40,20 @@ def main():
             plt.plot(x, y, color='k')
             xc = ri*np.cos(phi_center)
             yc = ri*np.sin(phi_center)
-            plt.plot(xc, yc, '.', color='r')
+            plt.plot(xc, yc, '.', color='k')  # midpoints
             if i == 0:
                 d = 2*R_i*np.sin(delta_phi/2)/(delta_phi/2*3)
             else:
                 d = 2*(R_i*R_i + R_i*R_i_prev + R_i_prev*R_i_prev)*np.sin(delta_phi/2)/(delta_phi/2*3*(R_i+R_i_prev))
             xc = d*np.cos(phi_center)
             yc = d*np.sin(phi_center)
-            plt.plot(xc, yc, '.', color='b')
+#            plt.plot(xc, yc, '.', color='b')  # centroids
             phi_prev = phi
         R_i_prev = R_i
 
-    ax.text(2.7, 1.7,r"$(r_{\mathrm{c},i},\, \phi_j)$",fontsize=16, color='b')
-    ax.text(1.6, 0.5,r"$(r_{\mathrm{m},i},\, \phi_j)$",fontsize=16, color='r')
+
+#    ax.text(2.7, 1.7,r"$(r_{\mathrm{c},i},\, \phi_j)$",fontsize=16, color='b')  # centroids
+    ax.text(1.6, 0.5,r"$(r_{\mathrm{m},i},\, \phi_j)$",fontsize=16, color='k')  # midpoints
     ax.text(0.5, -0.4,r"$R(1)=0$",fontsize=16, color='k')
     ax.text(5.2, -0.4,r"$R(2)$",fontsize=16, color='k')
     ax.text(7.4, -0.4,r"$R(3)$",fontsize=16, color='k')
