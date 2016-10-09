@@ -7,7 +7,8 @@ import time
 from scipy.interpolate import interp1d
 
 def main():
-    F_meas = np.array([6.0, 8.2, 11.5, 16.9, 28.4, 40.8, 48, 51.0, 65.2, 80.3,  100, 117,  174, 221, 298, 352, 400, 490], dtype='float')
+#    F_meas = np.array([6.0, 8.2, 11.5, 16.9, 28.4, 40.8, 48, 51.0, 65.2, 80.3,  100, 117,  174, 221, 298, 352, 400, 490], dtype='float')
+    F_meas = np.array([6.0, 8.2, 11.5, 16.9, 28.4, 40.8, 48, 51.0, 65.2, 80.3,  100, 126,  174, 240, 298, 352, 400, 490], dtype='float')
     s_meas = np.array([ 55,  50,   45,   40, 34.5,   30, 28, 27.8,   25,   23, 21.2,  20, 16.5,  15,  13,  12,  11, 9.8], dtype='float')
 
     m = 28.49 / 1000
@@ -23,8 +24,8 @@ def main():
 
     m1_r = 0.015875/2; m1_t = 0.01905; m1_Br = 1.2
     m2_r = 0.015000/2; m2_t = 0.00300; m2_Br = 1.2
-    Nr = 100
-    Nphi = 90
+    Nr = 30
+    Nphi = 60
     start = time.time()
     F0 = calc_force_dist(m1_r, m1_t, m1_Br, m2_r, m2_t, m2_Br, h_range, Nr, Nphi)
     m1_r = 0.015875/2; m1_t = 0.01905; m1_Br = 1.32
@@ -35,11 +36,11 @@ def main():
     xp = np.linspace(0.002,0.062, 61)
     fig = plt.figure(facecolor='white', figsize=(16, 9))
     plt.axhline(0, 0, 60, color='black')
-    plt.errorbar(np.multiply(s_meas,1000), F_meas, xerr=0.6, yerr=(2e-3 * g), label='Measurements')
+    plt.errorbar(np.multiply(s_meas,1000), F_meas, xerr=1.0, yerr=(15e-3 * g), label='Measurements')
     #plt.plot(np.multiply(s,1000), F, 'o', label='Measurements')
     # plt.plot(np.multiply(xp, 1000), pp3(xp), '-', label="3rd order polyfit")
     # plt.plot(np.multiply(xp, 1000), pp5(xp), '-', label="5th order polyfit")
-    plt.plot(np.multiply(h_range,1000), F0, '-', lw=2, label=r"FEM, $B_\mathrm{r} = 1.2\,\mathrm{T}$")
+#    plt.plot(np.multiply(h_range,1000), F0, '-', lw=2, label=r"FEM, $B_\mathrm{r} = 1.2\,\mathrm{T}$")
     plt.plot(np.multiply(h_range,1000), F, '-', lw=2, label=r"FEM, $B_\mathrm{r} = 1.32/1.37\,\mathrm{T}$")
     plt.legend()
     plt.axis([0.0, 60, -2.0, 6.0])
