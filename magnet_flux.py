@@ -469,7 +469,7 @@ def flux_linkage_Derby_axial(Br, h_mag, r_mag, h_coil, r_i, r_o, k_co, d_co, d, 
     return FL
 
 
-def calc_flux_gradient(m_Br, h_mag, r_mag, h_coil, r_i, r_o, N, d_co, d):
+def calc_flux_gradient(Br, h_mag, r_mag, h_coil, r_i, r_o, N, d_co, d):
     parts = 30
 
     k_co = np.pi * d_co * d_co * N / (4 * h_coil * (r_o - r_i))
@@ -479,15 +479,15 @@ def calc_flux_gradient(m_Br, h_mag, r_mag, h_coil, r_i, r_o, N, d_co, d):
 
     step = h_coil / Nz
 
-    y1 = flux_linkage_Derby_axial(m_Br, h_mag, r_mag, h_coil, r_i, r_o, k_co, d_co, d - step, parts)  # noqa
-    y2 = flux_linkage_Derby_axial(m_Br, h_mag, r_mag, h_coil, r_i, r_o, k_co, d_co, d + step, parts)  # noqa
+    y1 = flux_linkage_Derby_axial(Br, h_mag, r_mag, h_coil, r_i, r_o, k_co, d_co, d - step, parts)  # noqa
+    y2 = flux_linkage_Derby_axial(Br, h_mag, r_mag, h_coil, r_i, r_o, k_co, d_co, d + step, parts)  # noqa
     k = (y2 - y1) / (2 * step)
 
     return k
 
 
 @jit
-def calc_power(m_Br, h_mag, r_mag, h_coil, r_i, r_o, N, d_co, t0, a, f):
+def calc_power(Br, h_mag, r_mag, h_coil, r_i, r_o, N, d_co, t0, a, f):
     parts = 30
 
     k_co = np.pi * d_co * d_co * N / (4 * h_coil * (r_o - r_i))
@@ -496,9 +496,9 @@ def calc_power(m_Br, h_mag, r_mag, h_coil, r_i, r_o, N, d_co, t0, a, f):
     step = h_coil / Nz
 
     d = -(h_mag + h_coil) / 2 + t0 - step
-    y1 = flux_linkage_Derby_axial(m_Br, h_mag, r_mag, h_coil, r_i, r_o, k_co, d_co, d, parts)
+    y1 = flux_linkage_Derby_axial(Br, h_mag, r_mag, h_coil, r_i, r_o, k_co, d_co, d, parts)
     d = -(h_mag + h_coil) / 2 + t0 + step
-    y2 = flux_linkage_Derby_axial(m_Br, h_mag, r_mag, h_coil, r_i, r_o, k_co, d_co, d, parts)
+    y2 = flux_linkage_Derby_axial(Br, h_mag, r_mag, h_coil, r_i, r_o, k_co, d_co, d, parts)
     k = (y2 - y1) / (2 * step)
 
     resistivity = 1.709e-8 / (d_co * d_co * np.pi / 4)
@@ -523,7 +523,7 @@ def calc_power(m_Br, h_mag, r_mag, h_coil, r_i, r_o, N, d_co, t0, a, f):
 
 
 @jit
-def calc_power_all(m_Br, h_mag, r_mag, h_coil, r_i, r_o, N, d_co, t0, a, f):
+def calc_power_all(Br, h_mag, r_mag, h_coil, r_i, r_o, N, d_co, t0, a, f):
     parts = 30
 
     k_co = np.pi * d_co * d_co * N / (4 * h_coil * (r_o - r_i))
@@ -532,9 +532,9 @@ def calc_power_all(m_Br, h_mag, r_mag, h_coil, r_i, r_o, N, d_co, t0, a, f):
     step = h_coil / Nz
 
     d = -(h_mag + h_coil) / 2 + t0 - step
-    y1 = flux_linkage_Derby_axial(m_Br, h_mag, r_mag, h_coil, r_i, r_o, k_co, d_co, d, parts)
+    y1 = flux_linkage_Derby_axial(Br, h_mag, r_mag, h_coil, r_i, r_o, k_co, d_co, d, parts)
     d = -(h_mag + h_coil) / 2 + t0 + step
-    y2 = flux_linkage_Derby_axial(m_Br, h_mag, r_mag, h_coil, r_i, r_o, k_co, d_co, d, parts)
+    y2 = flux_linkage_Derby_axial(Br, h_mag, r_mag, h_coil, r_i, r_o, k_co, d_co, d, parts)
     k = (y2 - y1) / (2 * step)
 
 #    print "Nz = %d, Nr = %d, N = %d" % (round(Nz), round(Nr), round(N))
@@ -560,7 +560,7 @@ def calc_power_all(m_Br, h_mag, r_mag, h_coil, r_i, r_o, N, d_co, t0, a, f):
 
 
 @jit
-def calc_power_all_two_coils(m_Br, h_mag, r_mag, h_coil, r_i, r_o, N, d_co, t0, a, f):
+def calc_power_all_two_coils(Br, h_mag, r_mag, h_coil, r_i, r_o, N, d_co, t0, a, f):
     parts = 30
 
     k_co = np.pi * d_co * d_co * N / (4 * h_coil * (r_o - r_i))
@@ -569,9 +569,9 @@ def calc_power_all_two_coils(m_Br, h_mag, r_mag, h_coil, r_i, r_o, N, d_co, t0, 
     step = h_coil / Nz
 
     d = -(h_mag + h_coil) / 2 + t0 - step
-    y1 = flux_linkage_Derby_axial(m_Br, h_mag, r_mag, h_coil, r_i, r_o, k_co, d_co, d, parts)
+    y1 = flux_linkage_Derby_axial(Br, h_mag, r_mag, h_coil, r_i, r_o, k_co, d_co, d, parts)
     d = -(h_mag + h_coil) / 2 + t0 + step
-    y2 = flux_linkage_Derby_axial(m_Br, h_mag, r_mag, h_coil, r_i, r_o, k_co, d_co, d, parts)
+    y2 = flux_linkage_Derby_axial(Br, h_mag, r_mag, h_coil, r_i, r_o, k_co, d_co, d, parts)
     k = (y2 - y1) / (step)  # k is now doubled !!!!!!!!
 
     resistivity = 1.709e-8 / (d_co * d_co * np.pi / 4)
@@ -596,7 +596,7 @@ def calc_power_all_two_coils(m_Br, h_mag, r_mag, h_coil, r_i, r_o, N, d_co, t0, 
 
 
 @jit
-def calc_power_two_coils(m_Br, h_mag, r_mag, h_coil, r_i, r_o, N, d_co, t0, a, f):
+def calc_power_two_coils(Br, h_mag, r_mag, h_coil, r_i, r_o, N, d_co, t0, a, f):
     parts = 30
 
     k_co = np.pi * d_co * d_co * N / (4 * h_coil * (r_o - r_i))
@@ -605,9 +605,9 @@ def calc_power_two_coils(m_Br, h_mag, r_mag, h_coil, r_i, r_o, N, d_co, t0, a, f
     step = h_coil / Nz
 
     d = -(h_mag + h_coil) / 2 + t0 - step
-    y1 = flux_linkage_Derby_axial(m_Br, h_mag, r_mag, h_coil, r_i, r_o, k_co, d_co, d, parts)
+    y1 = flux_linkage_Derby_axial(Br, h_mag, r_mag, h_coil, r_i, r_o, k_co, d_co, d, parts)
     d = -(h_mag + h_coil) / 2 + t0 + step
-    y2 = flux_linkage_Derby_axial(m_Br, h_mag, r_mag, h_coil, r_i, r_o, k_co, d_co, d, parts)
+    y2 = flux_linkage_Derby_axial(Br, h_mag, r_mag, h_coil, r_i, r_o, k_co, d_co, d, parts)
     k = (y2 - y1) / (step)  # k is now doubled !!!!!!!!
 
     resistivity = 1.709e-8 / (d_co * d_co * np.pi / 4)
@@ -630,13 +630,46 @@ def calc_power_two_coils(m_Br, h_mag, r_mag, h_coil, r_i, r_o, N, d_co, t0, a, f
 
     return P
 
+@jit
+def calc_volt_power_to_load(Br, h_mag, r_mag, h_coil, r_i, r_o, N, d_co, t0, a, f, dm, R_load):
+    parts = 30
 
-def draw_flux_lines_coil(outfile, m_Br, r_mag, h_mag, r_i, r_o, h_coil, N, d_co, t0, P_max, two_coils, arrows, a, f):  # noqa
+    k_co = np.pi * d_co * d_co * N / (4 * h_coil * (r_o - r_i))
+
+    Nz = int(round(2.0 * h_coil / (d_co * np.sqrt(np.pi / k_co))))
+    step = h_coil / Nz
+
+    d = -(h_mag + h_coil) / 2 + t0 - step
+    y1 = flux_linkage_Derby_axial(Br, h_mag, r_mag, h_coil, r_i, r_o, k_co, d_co, d, parts)
+    d = -(h_mag + h_coil) / 2 + t0 + step
+    y2 = flux_linkage_Derby_axial(Br, h_mag, r_mag, h_coil, r_i, r_o, k_co, d_co, d, parts)
+    k = (y2 - y1) / (2 * step)
+
+    resistivity = 1.709e-8 / (d_co * d_co * np.pi / 4)
+    R_coil = N * np.pi * (r_o + r_i) * resistivity
+
+    de = k * k / (R_coil + R_load)
+    density = 7600.0
+    m = h_mag * np.pi * r_mag * r_mag * density
+#    print "de = %.2f, m = %.2f g" % (de, m*1000)
+
+    omega = 2 * np.pi * f
+    Z = m * a / ((de + dm) * omega)
+    speed = Z * omega
+
+    V = k * speed
+    V_load = V * R_load / (R_coil + R_load)
+    P = V_load * V_load / R_load
+
+    return V_load, P
+
+
+def draw_flux_lines_coil(outfile, Br, r_mag, h_mag, r_i, r_o, h_coil, N, d_co, t0, P_max, two_coils, arrows, a, f):  # noqa
 
     if two_coils:
-        Z, R_coil, R_load, k, V_load, P = calc_power_all_two_coils(m_Br, h_mag, r_mag, h_coil, r_i, r_o, N, d_co, t0, a, f)  # noqa
+        Z, R_coil, R_load, k, V_load, P = calc_power_all_two_coils(Br, h_mag, r_mag, h_coil, r_i, r_o, N, d_co, t0, a, f)  # noqa
     else:
-        Z, R_coil, R_load, k, V_load, P = calc_power_all(m_Br, h_mag, r_mag, h_coil, r_i, r_o, N, d_co, t0, a, f)
+        Z, R_coil, R_load, k, V_load, P = calc_power_all(Br, h_mag, r_mag, h_coil, r_i, r_o, N, d_co, t0, a, f)
 
     steps = 200
     steps2 = int(steps / 2)
@@ -652,7 +685,7 @@ def draw_flux_lines_coil(outfile, m_Br, r_mag, h_mag, r_i, r_o, h_coil, N, d_co,
 
     for i in range(steps):
         for j in range(steps2):
-            Bz_axial = nasa_axial(m_Br, r_mag, h_mag / 2, X[i][steps2 + j], Y[i][steps2 + j])
+            Bz_axial = nasa_axial(Br, r_mag, h_mag / 2, X[i][steps2 + j], Y[i][steps2 + j])
             B[i][steps2 + j] = -Bz_axial
             B[i][steps2 - j] = -Bz_axial
 
@@ -748,40 +781,40 @@ def draw_flux_lines_coil(outfile, m_Br, r_mag, h_mag, r_i, r_o, h_coil, N, d_co,
 #    raw_input("tadaa!")
 
 
-def harvester_sensitivity(m_Br, h_mag, r_mag, h_coil, r_i, r_o, N, d_co, t0, a, f, two_coils, tolerance):
+def harvester_sensitivity(Br, h_mag, r_mag, h_coil, r_i, r_o, N, d_co, t0, a, f, two_coils, tolerance):
 
     if two_coils:
         print "\nTwo coils:"
-        P_ref = calc_power_two_coils(m_Br, h_mag, r_mag, h_coil, r_i, r_o, N, d_co, t0, a, f)
+        P_ref = calc_power_two_coils(Br, h_mag, r_mag, h_coil, r_i, r_o, N, d_co, t0, a, f)
         print "P_ref = %.2f mW" % (P_ref * 1000)
-        P_h_mag_p  = calc_power_two_coils(m_Br, h_mag + tolerance, r_mag, h_coil, r_i, r_o, N, d_co, t0, a, f)
-        P_h_mag_n  = calc_power_two_coils(m_Br, h_mag - tolerance, r_mag, h_coil, r_i, r_o, N, d_co, t0, a, f)
-        P_r_mag_p  = calc_power_two_coils(m_Br, h_mag, r_mag + tolerance, h_coil, r_i, r_o, N, d_co, t0, a, f)
-        P_r_mag_n  = calc_power_two_coils(m_Br, h_mag, r_mag - tolerance, h_coil, r_i, r_o, N, d_co, t0, a, f)
-        P_h_coil_p = calc_power_two_coils(m_Br, h_mag, r_mag, h_coil + tolerance, r_i, r_o, N, d_co, t0, a, f)
-        P_h_coil_n = calc_power_two_coils(m_Br, h_mag, r_mag, h_coil - tolerance, r_i, r_o, N, d_co, t0, a, f)
-        P_r_i_p    = calc_power_two_coils(m_Br, h_mag, r_mag, h_coil, r_i + tolerance, r_o, N, d_co, t0, a, f)
-        P_r_i_n    = calc_power_two_coils(m_Br, h_mag, r_mag, h_coil, r_i - tolerance, r_o, N, d_co, t0, a, f)
-        P_r_o_p    = calc_power_two_coils(m_Br, h_mag, r_mag, h_coil, r_i, r_o + tolerance, N, d_co, t0, a, f)
-        P_r_o_n    = calc_power_two_coils(m_Br, h_mag, r_mag, h_coil, r_i, r_o - tolerance, N, d_co, t0, a, f)
-        P_t0_p     = calc_power_two_coils(m_Br, h_mag, r_mag, h_coil, r_i, r_o, N, d_co, t0 + tolerance, a, f)
-        P_t0_n     = calc_power_two_coils(m_Br, h_mag, r_mag, h_coil, r_i, r_o, N, d_co, t0 - tolerance, a, f)
+        P_h_mag_p  = calc_power_two_coils(Br, h_mag + tolerance, r_mag, h_coil, r_i, r_o, N, d_co, t0, a, f)
+        P_h_mag_n  = calc_power_two_coils(Br, h_mag - tolerance, r_mag, h_coil, r_i, r_o, N, d_co, t0, a, f)
+        P_r_mag_p  = calc_power_two_coils(Br, h_mag, r_mag + tolerance, h_coil, r_i, r_o, N, d_co, t0, a, f)
+        P_r_mag_n  = calc_power_two_coils(Br, h_mag, r_mag - tolerance, h_coil, r_i, r_o, N, d_co, t0, a, f)
+        P_h_coil_p = calc_power_two_coils(Br, h_mag, r_mag, h_coil + tolerance, r_i, r_o, N, d_co, t0, a, f)
+        P_h_coil_n = calc_power_two_coils(Br, h_mag, r_mag, h_coil - tolerance, r_i, r_o, N, d_co, t0, a, f)
+        P_r_i_p    = calc_power_two_coils(Br, h_mag, r_mag, h_coil, r_i + tolerance, r_o, N, d_co, t0, a, f)
+        P_r_i_n    = calc_power_two_coils(Br, h_mag, r_mag, h_coil, r_i - tolerance, r_o, N, d_co, t0, a, f)
+        P_r_o_p    = calc_power_two_coils(Br, h_mag, r_mag, h_coil, r_i, r_o + tolerance, N, d_co, t0, a, f)
+        P_r_o_n    = calc_power_two_coils(Br, h_mag, r_mag, h_coil, r_i, r_o - tolerance, N, d_co, t0, a, f)
+        P_t0_p     = calc_power_two_coils(Br, h_mag, r_mag, h_coil, r_i, r_o, N, d_co, t0 + tolerance, a, f)
+        P_t0_n     = calc_power_two_coils(Br, h_mag, r_mag, h_coil, r_i, r_o, N, d_co, t0 - tolerance, a, f)
     else:
         print "\nOne coil:"
-        P_ref = calc_power(m_Br, h_mag, r_mag, h_coil, r_i, r_o, N, d_co, t0, a, f)
+        P_ref = calc_power(Br, h_mag, r_mag, h_coil, r_i, r_o, N, d_co, t0, a, f)
         print "P_ref = %.2f mW" % (P_ref * 1000)
-        P_h_mag_p  = calc_power(m_Br, h_mag + tolerance, r_mag, h_coil, r_i, r_o, N, d_co, t0, a, f)
-        P_h_mag_n  = calc_power(m_Br, h_mag - tolerance, r_mag, h_coil, r_i, r_o, N, d_co, t0, a, f)
-        P_r_mag_p  = calc_power(m_Br, h_mag, r_mag + tolerance, h_coil, r_i, r_o, N, d_co, t0, a, f)
-        P_r_mag_n  = calc_power(m_Br, h_mag, r_mag - tolerance, h_coil, r_i, r_o, N, d_co, t0, a, f)
-        P_h_coil_p = calc_power(m_Br, h_mag, r_mag, h_coil + tolerance, r_i, r_o, N, d_co, t0, a, f)
-        P_h_coil_n = calc_power(m_Br, h_mag, r_mag, h_coil - tolerance, r_i, r_o, N, d_co, t0, a, f)
-        P_r_i_p    = calc_power(m_Br, h_mag, r_mag, h_coil, r_i + tolerance, r_o, N, d_co, t0, a, f)
-        P_r_i_n    = calc_power(m_Br, h_mag, r_mag, h_coil, r_i - tolerance, r_o, N, d_co, t0, a, f)
-        P_r_o_p    = calc_power(m_Br, h_mag, r_mag, h_coil, r_i, r_o + tolerance, N, d_co, t0, a, f)
-        P_r_o_n    = calc_power(m_Br, h_mag, r_mag, h_coil, r_i, r_o - tolerance, N, d_co, t0, a, f)
-        P_t0_p     = calc_power(m_Br, h_mag, r_mag, h_coil, r_i, r_o, N, d_co, t0 + tolerance, a, f)
-        P_t0_n     = calc_power(m_Br, h_mag, r_mag, h_coil, r_i, r_o, N, d_co, t0 - tolerance, a, f)
+        P_h_mag_p  = calc_power(Br, h_mag + tolerance, r_mag, h_coil, r_i, r_o, N, d_co, t0, a, f)
+        P_h_mag_n  = calc_power(Br, h_mag - tolerance, r_mag, h_coil, r_i, r_o, N, d_co, t0, a, f)
+        P_r_mag_p  = calc_power(Br, h_mag, r_mag + tolerance, h_coil, r_i, r_o, N, d_co, t0, a, f)
+        P_r_mag_n  = calc_power(Br, h_mag, r_mag - tolerance, h_coil, r_i, r_o, N, d_co, t0, a, f)
+        P_h_coil_p = calc_power(Br, h_mag, r_mag, h_coil + tolerance, r_i, r_o, N, d_co, t0, a, f)
+        P_h_coil_n = calc_power(Br, h_mag, r_mag, h_coil - tolerance, r_i, r_o, N, d_co, t0, a, f)
+        P_r_i_p    = calc_power(Br, h_mag, r_mag, h_coil, r_i + tolerance, r_o, N, d_co, t0, a, f)
+        P_r_i_n    = calc_power(Br, h_mag, r_mag, h_coil, r_i - tolerance, r_o, N, d_co, t0, a, f)
+        P_r_o_p    = calc_power(Br, h_mag, r_mag, h_coil, r_i, r_o + tolerance, N, d_co, t0, a, f)
+        P_r_o_n    = calc_power(Br, h_mag, r_mag, h_coil, r_i, r_o - tolerance, N, d_co, t0, a, f)
+        P_t0_p     = calc_power(Br, h_mag, r_mag, h_coil, r_i, r_o, N, d_co, t0 + tolerance, a, f)
+        P_t0_n     = calc_power(Br, h_mag, r_mag, h_coil, r_i, r_o, N, d_co, t0 - tolerance, a, f)
 
     print "\nLaTeX table:\n"
 
